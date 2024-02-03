@@ -8,14 +8,14 @@
    - Ruby/Bundler/Rails/ストレージ容量確保/MySQL
  - アプリの起動  
    - ブラウザ起動画面  
-     ![図1](images_lec3/AppStart.PNG =100x))  
+     ![図1](images_lec3/AppStart.PNG)  
    - soket情報(参照先)の追加  
-     ![図2](images_lec3/socket.PNG =100x))  
+     ![図2](images_lec3/socket.PNG)  
    - Block解除⇒エラーメッセージ内のhost情報を環境設定に追加 (`config/environment/development.rb`)  
-     ![図3](images_lec3/RunPreview2.PNG =100x))  
-     ![図4](images_lec3/Environment.PNG =100x))  
+     ![図3](images_lec3/RunPreview2.PNG)  
+     ![図4](images_lec3/Environment.PNG)  
    - VFS(Virtual File System)接続無しのエラーメッセージ⇒EC2再起動で解消  
-     ![図5](images_lec3/RunPreview.PNG =100x))  
+     ![図5](images_lec3/RunPreview.PNG)  
 
 
 ### APサーバー/DBエンジンの動作確認
@@ -30,14 +30,14 @@
 
  - 参考
    - 図6：バージョン確認結果
-     ![図6](images_lec3/version.PNG =100x))  
-     ![図6](images_lec3/version.PNG =100x))  
+     ![図6](images_lec3/version.PNG)  
+     ![図6](images_lec3/version.PNG)  
    - 図7：APサーバーの動作確認結果
-     ![図7-1](images_lec3/APserverShutDown.PNG =100x))  
-     ![図7-2](images_lec3/APserverRestart.PNG =100x)  
+     ![図7-1](images_lec3/APserverShutDown.PNG)  
+     ![図7-2](images_lec3/APserverRestart.PNG)  
    - 図8：DBエンジンの動作確認結果
-     ![図8-1](images_lec3/DBEngRestart.PNG =100x))  
-     ![図8-2](images_lec3/DBEngStop.PNG =100x))  
+     ![図8-1](images_lec3/DBEngRestart.PNG)  
+     ![図8-2](images_lec3/DBEngStop.PNG)  
 
 
 ## 所感・気づき事項
