@@ -43,9 +43,9 @@
 
    - 図7：APサーバーの動作確認結果(上:停止時(図7-1) / 下:再起動時(図7-2))  
      - 図7-1  
-       ![図7-1](images_lec3/APserverRestart.PNG)  
+       ![図7-1](images_lec3/APserverShutDown.PNG)  
      - 図7-2  
-       ![図7-2](images_lec3/APserverShutDown.PNG)  
+       ![図7-2](images_lec3/APserverRestart.PNG)  
 
 
    - 図8：DBエンジンの動作確認結果(上:停止時(図8-1) / 下:再起動時(図8-2))  
