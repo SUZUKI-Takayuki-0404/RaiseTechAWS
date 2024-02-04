@@ -29,24 +29,30 @@
    |確認項目|確認結果：<br> APサーバー|確認結果：<br> DBエンジン|確認結果：<br> Rails構成管理ツール
    |--|--|--|--|
    |名称とバージョン|Puma version 5.6.8(図6-1参照)|MySQL version 8.0.36(図6-1参照)|Bundler version 2.3.14(図6-2参照)|
-   |アクセス可否<br>終了時|不可(図7-1参照)|可(図8-1参照)| \- |
-   |アクセス可否<br>再起動時|不可(図7-2参照)|可(図8-2参照)| \- |
+   |アクセス可否<br>終了時|不可(図7-1参照)|不可(図8-1参照)| \- |
+   |アクセス可否<br>再起動時|可(図7-2参照)|可(図8-2参照)| \- |
 
 
  - 確認結果の付図  
    - 図6：バージョン確認結果(上:APサーバーとDBエンジン(図6-1) / 下:構成管理ツール(図6-2))  
-     ![図6-1](images_lec3/version.PNG)  
-     ![図6-2](images_lec3/version2.PNG)  
+     - 図6-1  
+       ![図6-1](images_lec3/version.PNG)  
+     - 図6-2
+       ![図6-2](images_lec3/version2.PNG)  
 
 
    - 図7：APサーバーの動作確認結果(上:停止時(図7-1) / 下:再起動時(図7-2))  
-     ![図7-1](images_lec3/APserverRestart.PNG)  
-     ![図7-2](images_lec3/APserverShutDown.PNG)  
+     - 図7-1  
+       ![図7-1](images_lec3/APserverRestart.PNG)  
+     - 図7-2  
+       ![図7-2](images_lec3/APserverShutDown.PNG)  
 
 
    - 図8：DBエンジンの動作確認結果(上:停止時(図8-1) / 下:再起動時(図8-2))  
-     ![図8-1](images_lec3/DBEngStop.PNG)  
-     ![図8-2](images_lec3/DBEngRestart.PNG)  
+     - 図8-1  
+       ![図8-1](images_lec3/DBEngStop.PNG)  
+     - 図8-2  
+       ![図8-2](images_lec3/DBEngRestart.PNG)  
 
 
 ## 所感・気づき事項
