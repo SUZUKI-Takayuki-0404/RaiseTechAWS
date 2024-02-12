@@ -41,7 +41,6 @@
   - EC2を停止しようとして「終了」（＝削除）を誤選択し、作り直しに。
     ![図E1](images_lec4/E1_TerminateEC2.PNG)  
   - RDS用のセキュリティグループ見直し時のエラー表示（そもそも選択できないパラメータであるかと誤認しそうになった。調べた結果、行を追加して見直し内容を記入し、見直し前の行を削除すれば良いと判明。）
-    ![図E2](images_lec4/E2_SG-RuleChangeError.PNG)  
     ![図E3](images_lec4/E3_SG-RuleChangeError2.PNG)  
 
 
