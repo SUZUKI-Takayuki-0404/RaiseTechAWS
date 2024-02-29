@@ -4,22 +4,29 @@
 
 ### [サンプルアプリケーション](https://github.com/yuta-ushijima/raisetech-live8-sample-app)のデプロイ結果
 
-- 組み込みサーバーのみ\(RDSへのデータ登録も確認\)  
+- 組み込みサーバーのみ\(RDSへのデータ登録成功も確認\)  
   ![図](images_lec5/fruit_db_enbded.PNG)  
   ![図](images_lec5/check_RDS_table.PNG)  
-- サーバーアプリケーションを分離\(curlコマンドでsocket接続\)  
+
+
+- サーバーアプリケーションを分離\(curlコマンドでsocket接続確認\)  
   ![図](images_lec5/curl_socket_nginx.PNG)  
   ![図](images_lec5/start_status_nginx_unicorn.PNG)  
 
+
 - ELB(ALB)追加  
   ![図](images_lec5/.PNG)  
+
+
 - S3追加  
   ![図](images_lec5/.PNG)  
+
 
 ### 構成図
 
 - [Draw.io](https://app.diagrams.net/)で作成  
-  ![図](images_lec5/.PNG)
+  ![図](images_lec5/.PNG)  
+
 
 ## 所感
 
@@ -37,6 +44,7 @@
 
 1. EC2にSSHで接続  
    ![図](images_lec5/ssh.PNG)  
+
 2. yumの最新化  
    ![図](/images_lec5/sudo_yum_update.PNG)  
 
@@ -75,10 +83,10 @@
       gpg2 --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
       curl -sSL https://get.rvm.io | bash -s stable
       ```
-
+ 
     - Rubyのインストール・設定反映・デフォルト設定  
       ![図](images_lec5/source_RVM.PNG)  
-      ![図](images_lec5/use_version_RVM.PNG)  
+      ![図](images_lec5/use_version_RVM.PNG)
 
       ```
       source /home/ec2-user/.rvm/scripts/rvm
