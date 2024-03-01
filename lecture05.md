@@ -7,15 +7,15 @@
 - 組み込みサーバーのみ  
   ![図](images_lec5/fruit_db_enbded.PNG)  
 
-  - \(RDSへのデータ登録成功も確認\)  
+  - RDSへのデータ登録できていることも確認  
     ![図](images_lec5/check_RDS_table.PNG)  
 
 
 - サーバーアプリケーションを分離  
-  ![図](images_lec5/curl_socket_nginx.PNG)  
-
-    - curlコマンドでunix domain socket経由アクセス接続確認  
   ![図](images_lec5/start_status_nginx_unicorn.PNG)  
+
+  - curlコマンドでunix domain socket経由アクセス接続確認  
+    ![図](images_lec5/curl_socket_nginx.PNG)  
 
 
 - ELB(ALB)追加  
@@ -23,8 +23,8 @@
 
 
 - S3追加  
-  ![図](images_lec5/.PNG)  
-
+  ![図](images_lec5/s3_test3.PNG)  
+  ![図](images_lec5/s3_test4.PNG)  
 
 ### 構成図
 
@@ -237,9 +237,9 @@
   ```
 
 - Unicornの起動・停止・状態確認  
-  :::note info
+  [!NOTE]
   起動時に\-pオプションでポート番号指定、\-Eオプションで環境指定\(`deveopment`は開発環境、`production`は本番環境\)、-Dオプションでデーモン\(常駐\)プロセス  
-  :::
+  
 
   ```
   bundle exec unicorn -c config/unicorn.rb -p 3000 -E development -D
@@ -249,9 +249,9 @@
   kill -QUIT `cat tmp/pids/unicorn.pid`
   ```
 
-  :::note warn
+  [!WARNING]
   pidファイルの保管場所にパスを修正しないと、pidファイルが無い旨のエラーが出て停止できない  
-  :::
+
 
   ```
   ps -ef | grep unicorn | grep -v grep
@@ -276,9 +276,9 @@
 
 - Nginxのインストール  
 
-  :::note warn
+  [!WARNING]
   Unicorn使用し起動成功を確認後に着手
-  :::
+  
 
   - インストールコマンドの確認  
     ![図](images_lec5/AWS_extras.PNG)  
