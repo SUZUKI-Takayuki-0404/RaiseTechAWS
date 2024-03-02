@@ -312,7 +312,7 @@
   sudo nginx -t
   ```
 
-  `local@unicorn`の記述の中に`proxy_set_header`がないと以下エラー  
+  - `local@unicorn`の記述の中に`proxy_set_header`がないと以下エラー  
     ![図](images_lec5/error_proxy_set.PNG)  
 
 
