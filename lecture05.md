@@ -5,42 +5,47 @@
 ### [サンプルアプリケーション](https://github.com/yuta-ushijima/raisetech-live8-sample-app)のデプロイ結果
 
 - 組み込みサーバーのみ  
-  ![図](images_lec5/fruit_db_enbded.PNG)  
+    ![図](images_lec5/fruit_db_enbded.PNG)  
 
   - RDSへのデータ登録できていることも確認  
-    ![図](images_lec5/check_RDS_table.PNG)  
+      ![図](images_lec5/check_RDS_table.PNG)  
 
 
 - サーバーアプリケーションを分離  
-  ![図](images_lec5/start_status_nginx_unicorn.PNG)  
+    ![図](images_lec5/start_status_nginx_unicorn.PNG)  
 
   - curlコマンドでunix domain socket経由アクセス接続確認  
-    ![図](images_lec5/curl_socket_nginx.PNG)  
+      ![図](images_lec5/curl_socket_nginx.PNG)  
 
 
 - ALB追加  
-  ![図](images_lec5/access_through_alb.PNG)  
+    ![図](images_lec5/access_through_alb.PNG)  
 
 
 - S3追加  
-  ![図](images_lec5/s3_test3.PNG)  
+    ![図](images_lec5/s3_test3.PNG)  
 
-  - S3側で登録された画像を確認
-    ![図](images_lec5/s3_test4.PNG)  
+    - S3側で登録された画像を確認  
+      ![図](images_lec5/s3_test4.PNG)  
+
 
 ### 構成図
 
 - [Draw.io](https://app.diagrams.net/)で作成  
-  ![図](images_lec5/.PNG)  
+    ![図](images_lec5/AWS_Architecture.PNG)  
+
 
 
 ## 所感
 
 - ALBとS3については、マネジメントコンソール内で説明書きを読みながら割とあっさり設定完了できた  
-- 今回の課題は各種ソフトウェアのインストール・Ruby on Rails・Unicorn・Nginxの導入をAWSよりも学ぶウエイトが大きかった。 事前に設定方法や手順を整理して臨んだが、これができていなかったらもっと時間がかかったはず。  
+  - 今回の課題では、AWS自体よりも知識をほとんど持っていないRuby on Rails・Unicorn・Nginxの導入を学ぶウエイトが大きかった。 
+  - 事前に設定方法や手順を整理して臨んだが、これができていなかったらもっと時間がかかった。 
+
+
 - 今回一番の手戻り  
-    - NginxとUnicornを両方起動して通信させる際、403エラーの解決に3日要した。原因はNginxの設定ファイル内のtry_filesの記載漏れが原因だが、エラー番号から連想できない箇所で、NginxとUnicornのユーザー不整合やアクセス権限の問題を探してしまった。  
-      ![図](images_lec5/forbidden_by_tryfiles.PNG)  
+    - NginxとUnicornを両方起動して通信させる際、403エラーの解決に3日要した。原因はNginxの設定ファイル内のtry_filesの記載漏れが原因\(下図はエラー再現実験\)だが、エラー番号から連想できない箇所で、NginxとUnicornのユーザー不整合やアクセス権限の問題を散々探してしまった。  
+      ![図](images_lec5/error_try_files.PNG)  
 
 
 ## 備忘録
@@ -216,18 +221,18 @@
   > [!IMPORTANT]  
   > 組み込みサーバーによる起動成功を確認後に着手
 
-    - Gemfileに以下コードが記載されていることを確認  
+  - Gemfileに以下コードが記載されていることを確認  
 
-      ```ruby:Gemfile
-      gem 'unicorn'
-      ```
+    ```ruby:Gemfile
+    gem 'unicorn'
+    ```
 
-    - インストールコマンド実行
-      ![図](images_lec5/install_bundle_unicorn.PNG)  
+  - インストールコマンド実行
+    ![図](images_lec5/install_bundle_unicorn.PNG)  
 
-      ```
-      bundle install
-      ```
+    ```
+    bundle install
+    ```
 
 - 設定用ファイルの作成・編集  
   [`unicorn.rb`](https://github.com/herokaijp/devcenter/wiki/Rails-unicorn#%E8%A8%AD%E5%AE%9A)を編集し、sockteファイル・pidファイルの保存先を見直し  
@@ -241,22 +246,22 @@
   > [!NOTE]  
   > 起動時に\-pオプションでポート番号指定、\-Eオプションで環境指定\(`deveopment`は開発環境、`production`は本番環境\)、-Dオプションでデーモン\(常駐\)プロセス
 
-    ```
-    bundle exec unicorn -c config/unicorn.rb -p 3000 -E development -D
-    ```
+  ```
+  bundle exec unicorn -c config/unicorn.rb -p 3000 -E development -D
+  ```
 
-    ```
-    kill -QUIT `cat tmp/pids/unicorn.pid`
-    ```
+  > [!IMPORTANT]  
+  > pidファイルの保管場所にパスを修正しないと、pidファイルが無い旨のエラーが出て停止できない  
 
-    > [!IMPORTANT]  
-    > pidファイルの保管場所にパスを修正しないと、pidファイルが無い旨のエラーが出て停止できない  
+  ```
+  kill -QUIT `cat tmp/pids/unicorn.pid`
+  ```
 
-    ```
-    ps -ef | grep unicorn | grep -v grep
-    ```
+  ```
+  ps -ef | grep unicorn | grep -v grep
+  ```
 
-    ![図](images_lec5/start_status_unicorn.PNG)  
+  ![図](images_lec5/start_status_unicorn.PNG)  
 
   エラー時は以下を確認  
   ![図](images_lec5/error_RDS_not_activate1.PNG)  
@@ -296,8 +301,10 @@
     nginx -v
     ```
 
+
 - 設定用ファイルの作成・編集・内容チェック  
-  ![図](images_lec5/.PNG)★  
+  ![図](images_lec5/nginx_cnf_update_point1.PNG)  
+  ![図](images_lec5/nginx_cnf_update_point.PNG)  
 
   ```
   sudo cp -a /etc/nginx/nginx.conf /etc/nginx/nginx.conf.sample
@@ -308,11 +315,13 @@
   `local@unicorn`の記述の中に`proxy_set_header`がないと以下エラー  
     ![図](images_lec5/error_proxy_set.PNG)  
 
-  `server`の記述の中に`try_files`がないと以下エラー  
+
+  - `server`の記述の中に`try_files`がないと以下エラー\(下図はエラー再現実験\)  
+    ![図](images_lec5/forbidden_by_tryfiles.PNG)  
     ![図](images_lec5/error_try_files.PNG)  
 
 
-  - Nginxのの起動・停止・状態確認  
+  - Nginxの起動・停止・状態確認\(下図はエラー再現実験\)  
     ![図](images_lec5/start_status_nginx_only.PNG)  
     ![図](images_lec5/test_status_start_nginx.PNG)  
     ![図](images_lec5/ps_aux_unicorn_nginx.PNG)  
@@ -330,6 +339,7 @@
     ps aux | grep nginx
     ```
 
+
   - EC2インスタンス起動時とあわせた自動起動ON/OFF  
 
     ```
@@ -337,11 +347,13 @@
     sudo systemctl disable nginx
     ```
 
+
   - エラー時は以下を確認  
 
     ```
     sudo cat /var/log/nginx/error.log
     ```
+
 
 - `config/environments/development.rb`の設定変更後、CSS有効化のため以下コマンド実行  
   ![図](images_lec5/css_enhance.PNG)  
@@ -350,26 +362,27 @@
   bin/rails assets:precompile  
   ```
 
+
 - EC2のインバウンドルールに80番ポート追加  
   ![図](images_lec5/SGupdated.PNG)  
 
 8. ALBの設定
 
-- ALB用のセキュリティグループの設定  
-  ![図](images_lec5/.PNG)★  
-
 - ALBの設定  
   ![図](images_lec5/elb-1.PNG)  
+
+
+- ALB用のセキュリティグループの設定  
+  ![図](images_lec5/ELB_SG_properties.PNG)  
+
 
 - ターゲットグループの設定とヘルスチェック\(要アプリ起動\)  
   ![図](images_lec5/tg-1.PNG)  
   ![図](images_lec5/tg_healsth_check1.PNG)  
   ![図](images_lec5/alb-properties-1.PNG)  
 
-- ALB経由でアクセスしたところブロック  
-  ![図](images_lec5/erro_alb_access.PNG)  
 
-- `sconfig/environments/development.rb`の設定変更で解消  
+- ALB経由でアクセスしたところブロック ⇒ `sconfig/environments/development.rb`の設定変更で解消  
   ![図](images_lec5/update_config_environments_development.PNG)  
 
 9. S3の設定
@@ -378,8 +391,9 @@
   ![図](images_lec5/S3_properties.PNG)  
   ![図](images_lec5/S3_encryption_default_setting.PNG)  
 
+
 - IAMユーザーの作成\(S3アクセス用\)  
-  - IAMロールを作成しS3FullAccess権限付与  
+  - ユーザーを新規作成しS3FullAccess権限付与  
     ![図](images_lec5/IAM_attatch_Policy.PNG)  
     ![図](images_lec5/IAM-make-key.PNG)  
     ![図](images_lec5/IAM-make-Key-UseCase.PNG)  
@@ -388,15 +402,14 @@
     ![図](images_lec5/IAM-Key-DL.PNG)  
     ![図](images_lec5/IAM-properties.PNG)  
 
-  - EC2にIAMロール付与  
-    ![図](images_lec5/IAMRole_Set_EC2.PNG)  
-  - ![図](images_lec5/SetIAMToEC2.PNG)  
-    ![図](images_lec5/MakeIAMforEC2.PNG)  
 
 - EC2にS3接続用のIAMロールを作成して付与  
   - S3FullAccess権限付与  
-    ![図](images_lec5/.PNG)★  
+    ![図](images_lec5/IAMRole_Properties_S3Full.PNG)  
+
+  - EC2にIAMロール付与  
     ![図](images_lec5/IAMRole_Set_EC2.PNG)  
+
 
 - Unicornの設定ファイル編集  
   - `Gemfile`の設定変更\(要すれば\)  
@@ -426,19 +439,15 @@
     secret_access_key: ＜IAMユーザーのsecret_access_key＞
     ```
 
-    - 設定時、次のエラーメッセージが出たので、古い`credentials.yml.enc`をリネームして退避し、`config/master.key`、`credentials.yml.enc`を新しく作成  
+    > [!NOTE]  
+    > 登録時に以下エラーメッセージが出たら、古い`credentials.yml.enc`をリネームして退避、`config/master.key`、`credentials.yml.enc`を新規作成  
 
-      ```
-      create  config/master.key
-      Couldn't decrypt config/credentials.yml.enc. Perhaps you passed the wrong key?
-      ```
+    ![図](images_lec5/editoor_vi_credentials.PNG)  
 
-      ![図](images_lec5/editoor_vi_credentials.PNG)  
-
-      ```
-      mv config/credentials.yml.enc config/credentials_old.yml.enc
-      touch config/master.key
-      ```
+    ```
+    mv config/credentials.yml.enc config/credentials_old.yml.enc
+    touch config/master.key
+    ```
 
   - `config/environments/development.rb`の設定変更  
     ![図](images_lec5/edit_config_environments_development_rb.PNG)  
@@ -446,6 +455,7 @@
     ```
     config.active_storage.service = :amazon
     ```
+
 
 - EC2、Nginx、Unicorn、RDSを起動して動作確認  
   ![図](images_lec5/S3_test1.PNG)  
