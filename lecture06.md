@@ -7,7 +7,7 @@
 AWS使用記録をCloudTrailのイベントから自身のIAM ユーザー名があるリストアップ  
 
   - 取り上げたイベント名：[GetEventSelectors](https://docs.aws.amazon.com/ja_jp/awscloudtrail/latest/userguide/logging-management-events-with-cloudtrail.html)
-    - CloudTrailがこれまでに管理イベントを証跡として記録しているか確認するために使用される
+    - CloudTrailがこれまでに証跡として記録している管理イベントを確認するために使用される
 
   - CloudTrailに含まれる主な内容\(以下に3件例示\)：AWS上で、誰が、いつ、何をしたかを特定できる内容が含まれている
     - イベント時間
@@ -147,7 +147,5 @@ ALB のアラームを設定しメール通知
   - ALB見積り  
     ![図](images_lec6/AWS_Pricing_Calculator12.PNG)  
     ![図](images_lec6/AWS_Pricing_Calculator13.PNG)  
-
-  - 課題5までに作成したリソース内容見積[URL](https://calculator.aws/#/estimate?id=ce1d019ab7dec12e96c39fe4b2a422c8d8e570c2)  
-
+ 
 </details>
