@@ -38,13 +38,13 @@ ALB のアラームを設定しメール通知
 ### AWS利用料の見積書作成
 
 課題5までに作成したリソース内容の見積[URL](https://calculator.aws/#/estimate?id=82dfc620e4444961a2ac08790249d0c4fb957a1d)  
-  ![図](images_lec6/AWS_Architecture.PNG)  
+  ![図](images_lec6/AWS_Architecture2.PNG)  
 
 
 ### 料金確認
 
 > [!NOTE]  
-> 請求期間: 3月1日 - 2024年3月31日  
+> 請求期間: 2024年3月1日 - 2024年3月31日  
 
 マネジメントコンソールから、EC2の利用料を確認
   - 請求額のサマリー  
