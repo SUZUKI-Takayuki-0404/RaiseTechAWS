@@ -1,2 +1,2 @@
 # RaiseTechAWS
-For AWS courses' homework
+For AWS course's homework

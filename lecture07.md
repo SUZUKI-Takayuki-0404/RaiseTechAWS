@@ -6,22 +6,37 @@
 
 |No.|セキュリティリスク|対策|
 |--|--|--|
-|1|HTTP通信であり暗号化していない|ACMを追加しHTTP通信にする|
+|1|HTTP通信であり暗号化していない|ACMを追加しHTTPS通信にする|
 |2|SQLインジェクションやクロスサイトスクリプティングの対策をしていない|ELBにWAFを追加し、関連する機能を有効化する \(参考:図1\)|
 |3|S3をパブリックアクセスにしてしまう|S3のコンソール画面で公開になっていないことを確認する\(補足：デフォルトではブロックパブリックアクセスは有効であり設定変更をしない\) \(参考:図2\)|
 
 
-図1: AWS WAF設定画面  
-![図1](images_lec7/WAF-set1.PNG)  
+- 図1: AWS WAF設定画面  
+  ![図1](images_lec7/WAF-set1.PNG)  
 
 
-図2: S3設定画面  
-![図2](images_lec7/BlockPublic1.PNG)  
+- 図2: S3設定画面  
+  ![図2](images_lec7/BlockPublic1.PNG)  
+
+
+- ACMおよびAWS WAFを追加したリソース内容の見積[URL](https://calculator.aws/#/estimate?id=367daa741c382b3975d008b5272b12aec3a046ba)  
+  利用条件にもよるが、決して安い追加コストとはいえないと認識する。
+  ![図](images_lec7/cost_kadai7.PNG)  
+
+  構成図  
+  ![図](images_lec7/Security_added.PNG)  
+
+
+- （参考比較）課題5までに作成したリソース内容の見積（課題6として作成したもの）[URL](https://calculator.aws/#/estimate?id=82dfc620e4444961a2ac08790249d0c4fb957a1d)  
+  ![図](images_lec7/cost_kadai6.PNG)  
+
+  構成図  
+  ![図](images_lec6/AWS_Architecture2.PNG)  
 
 
 # 所感
 
- - セキュリティ導入に当たっては、抜け漏れが無いか、AWS上の環境構築時にレビューを受けるなど、設計不備に起因するミスは防ぐようにしたい。
+ - セキュリティ導入に当たっては、抜け漏れが無いか、AWS上の環境構築時にレビューを受けるなど、設計検討不足に起因するミスは防ぐようにしたい。
  - 過剰なセキュリティ対策はコストになるだけなので、取扱うデータの内容や重要性にあわせて、必要なセキュリティ対策を必要な分だけ導入できるよう知識をつけたい。
  - AWSのセキュリティ対策以前の基本的事項として、ソーシャルエンジニアリングや日常のパスワード管理など基本的な情報管理に注意する。
 
@@ -49,7 +64,7 @@
     - [Amazon GuardDuty](https://docs.aws.amazon.com/ja_jp/guardduty/?icmpid=docs_homepage_security)  
       CloudTrail、VPCフローログ\(EC2\)、DNSログなどを利用したモニタリングサービスで分析結果をHIGH\/MID\/LOWに分類。
 
-  - アプリケーション・保管データ関連
+  - アプリケーション・データ保護関連
     - [CodeGuru Reviewer](https://docs.aws.amazon.com/ja_jp/codeguru/latest/reviewer-ug/welcome.html)  
       Java/Pythonアプリケーションのパフォーマンス、効率、コード品質を向上するための推奨事項を提案する。
     - [Patch Manager](https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/patch-manager.html)  
@@ -69,15 +84,13 @@
   - 暗号化関連
     - [ACM\(Certificate Manager\)](https://docs.aws.amazon.com/ja_jp/acm/)  
       AWSリソースでのSSL/TLS証明書の準備、管理、デプロイを一元管理容易する。  
-      他のAWSサービスと結合され、コンソール画面からSSL/TLS証明書の配置ができる。  
+      他のAWSサービスと結合され、コンソール画面からSSL/TLS証明書の配置ができる。ELBやCloudFrontに適用。  
     - [AWS Key Management Service\(KMS\)](https://docs.aws.amazon.com/ja_jp/kms/?icmpid=docs_homepage_crypto) は、AWS の暗号鍵マネージドサービス  
       S3はじめAWSの他のサービスで使用される暗号化およびキー管理サービス。保管データの暗号化に加え、鍵自体の暗号化も行う。
     - [AWS Secrets Manager](https://docs.aws.amazon.com/ja_jp/secretsmanager/?icmpid=docs_homepage_security)  
       データベースやその他のサービスの認証情報を安全に暗号化、保存、取得。
       必要に応じSecrets Managerを呼び出し認証情報を取得することで、アプリケーションでの認証情報ハードコーディングを不要にする。
       RDSではDBのアクセスパスワード定期変更も可能。  
-    - [Amazon Route 53](https://docs.aws.amazon.com/ja_jp/route53/?icmpid=docs_homepage_networking)  
-      ドメイン登録、DNSルーティング、ヘルスチェックの3つの主要な機能を設定。ACM追加時に併用。  
 
   - 監査・不正検知関連
     - [AWS Config](https://docs.aws.amazon.com/ja_jp/config/?icmpid=docs_homepage_mgmtgov)  
