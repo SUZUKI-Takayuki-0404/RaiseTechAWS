@@ -7,8 +7,8 @@
 |No.|セキュリティリスク|対策|
 |--|--|--|
 |1|HTTP通信であり暗号化していない|ACMを追加しHTTPS通信にする|
-|2|SQLインジェクションやクロスサイトスクリプティングの対策をしていない|ELBにWAFを追加し、関連する機能を有効化する \(参考:図1\)|
-|3|S3をパブリックアクセスにしてしまう|S3のコンソール画面で公開になっていないことを確認する\(補足：デフォルトではブロックパブリックアクセスは有効であり設定変更をしない\) \(参考:図2\)|
+|2|SQLインジェクションやクロスサイトスクリプティングの対策をしていない|ELBにWAFを追加し、関連する機能を有効化する \(参考：図1\)|
+|3|S3をパブリックアクセスにしてしまう|S3のコンソール画面で公開になっていないことを確認する\(補足：デフォルトではブロックパブリックアクセスは有効であり設定変更をしない\) \(参考：図2\)|
 
 
 - 図1: AWS WAF設定画面  
@@ -19,18 +19,20 @@
   ![図2](images_lec7/BlockPublic1.PNG)  
 
 
-- ACMおよびAWS WAFを追加したリソース内容の見積[URL](https://calculator.aws/#/estimate?id=367daa741c382b3975d008b5272b12aec3a046ba)  
+### セキュリティ対策コスト
+
+- 上記で検討したACMおよびAWS WAFを追加したリソース内容の見積[URL](https://calculator.aws/#/estimate?id=367daa741c382b3975d008b5272b12aec3a046ba)  
   利用条件にもよるが、決して安い追加コストとはいえないと認識する。
   ![図](images_lec7/cost_kadai7.PNG)  
 
-  構成図  
+  図3：構成図（ACMとAWS WAFを追加）
   ![図](images_lec7/Security_added.PNG)  
 
 
 - （参考比較）課題5までに作成したリソース内容の見積（課題6として作成したもの）[URL](https://calculator.aws/#/estimate?id=82dfc620e4444961a2ac08790249d0c4fb957a1d)  
   ![図](images_lec7/cost_kadai6.PNG)  
 
-  構成図  
+  図4：構成図（ACM・AWS WAF追加前）
   ![図](images_lec6/AWS_Architecture2.PNG)  
 
 
