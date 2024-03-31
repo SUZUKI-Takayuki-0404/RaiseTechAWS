@@ -21,7 +21,7 @@
 
 ### セキュリティ対策コスト
 
-- 上記で検討したACMおよびAWS WAFを追加したリソース内容の見積 [URL](https://calculator.aws/#/estimate?id=e3a2fe1ab35cf20d0ef4ed3069290984a2adbfc2)  
+- 上記で検討したACMおよびAWS WAFを追加したリソース内容の見積 [URL](https://calculator.aws/#/estimate?id=36de21e99e94661c41c26a017083b31cba572471)  
   利用条件にもよるが、決して安い追加コストとはいえないと認識する。  
   
   ![図](images_lec7/cost_kadai7.PNG)  
@@ -30,7 +30,7 @@
   ![図](images_lec7/Security_added.PNG)  
 
 
-- （参考比較）課題5までに作成したリソース内容の見積（課題6として作成したもの）[URL](https://calculator.aws/#/estimate?id=85bdc6fa23d776f666165d251d2d1bc05e66e22d)  
+- （参考比較）課題5までに作成したリソース内容の見積（課題6として作成したもの）[URL](https://calculator.aws/#/estimate?id=0ae050b001df0e87b99bff18c4b37ed7f1043155)  
   ![図](images_lec7/cost_kadai6.PNG)  
 
   図4：構成図（ACM・AWS WAF追加前）
