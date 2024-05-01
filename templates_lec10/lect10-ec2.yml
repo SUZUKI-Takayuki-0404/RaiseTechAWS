@@ -5,7 +5,7 @@ Description: Template of EC2(incl. IAM resources to access S3) for Lecture10
 #-----------------------------------------------------------------------------------------------
 Parameters:
 # Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
-  # Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
 #-----------------------------------------------------------------------------------------------
   EnvironmentName:
     Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack

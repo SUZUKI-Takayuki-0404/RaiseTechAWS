@@ -13,11 +13,11 @@ CloudFormation を利用して、これまで手動で作った環境をコー�
 - 分かりやすさの観点から、なるべくEC2・RDS等のサービス単位でテンプレートファイル作成
 - クロススタックによるテンプレートファイル間の変数依存を必要最小限とすべく、変数の参照・被参照のあるリソースはなるべく同一テンプレートファイル内に記述
 
-|Template File|Contents|
+|Template File|Resources|
 |--|--|
 |[lect10-vpc.yml](templates_lec10/lect10-vpc.yml)|VPC, IGW、Route Table, Subnet, Security Group|
 |[lect10-ec2.yml](templates_lec10/lect10-ec2.yml)|EC2 Instance, Instance Profile, IAM Role(for access to S3)|
-|[lect10-alb.yml](templates_lec10/lect10-alb.yml)|ALB, Target Group, Listener|
+|[lect10-alb.yml](templates_lec10/lect10-alb.yml)|Load Balancer, Target Group, Listener|
 |[lect10-rds.yml](templates_lec10/lect10-rds.yml)|RDS Instance, DB Subnet Group|
 |[lect10-s3.yml](templates_lec10/lect10-s3.yml)|S3|
 |[lect10-cw.yml](templates_lec10/lect10-cw.yml)|CloudWatch Alarm、SNS Topic, Subscription|
