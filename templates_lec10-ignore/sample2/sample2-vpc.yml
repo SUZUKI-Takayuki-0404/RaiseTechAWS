@@ -1,0 +1,196 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+# raisetech第10回課題として、VPC作成からunicornとNginxを使ったアプリケーション起動まで
+Description: Create BaseNetwork vpc subnet
+
+# ===========================================================================
+# Input Parameters
+# ===========================================================================
+
+Parameters:
+  EnvironmentName:
+    Description: Please type the EnvironmentName.
+    Type: String
+    Default: test10
+
+  CidrBlock:
+    Description: Please type the CidrBlock.
+    Type: String
+    Default: 10.0.0.0/16
+
+
+Resources:
+  # ===========================================================================
+  # VPC
+  # ===========================================================================
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-vpc
+  # ===========================================================================
+  # Subnet
+  # ===========================================================================
+
+  # パブリックサブネットを２つ作成
+
+  MyPublicSubnet01:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref MyVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-public-subnet01
+
+  MyPublicSubnet02:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref MyVPC
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.2.0/24
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-public-subnet02
+
+  # プライベートサブネットを２つ作成
+
+  MyPrivateSubnet01:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref MyVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.3.0/24
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-private-subnet01
+
+  MyPrivateSubnet02:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref MyVPC
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.4.0/24
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-private-subnet02
+
+  # ===================================================================
+  # ルートテーブル関連
+  # ===================================================================
+
+  # ルートテーブルをパブリックサブネット、プライベートサブネット用それぞれで作成
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: name
+          Value: !Sub "${EnvironmentName}-public-rtb"
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: name
+          Value: !Sub "${EnvironmentName}-private-rtb"
+
+  # パブリックサブネット、プライベートサブネットをそれぞれのルートテーブルに割り振る
+  PublicSubnet01RouteTableAssociation:  # MyPublicSubnet01をPublicRouteTableに関連する
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPublicSubnet01
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet02RouteTableAssociation:  # MyPublicSubnet02をPublicRouteTableに関連する
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPublicSubnet02
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateSubnet01RouteTableAssociation:  # MyPrivateSubnet01をPraiveteRouteTableに関連する
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPrivateSubnet01
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet02RouteTableAssociation:  # MyPrivateSubnet02をPriveteRouteTableに関連する
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MyPrivateSubnet02
+      RouteTableId: !Ref PrivateRouteTable
+
+  #====================================================================
+  # InternetGateway作成
+  #====================================================================
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-InternetGateway"
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref MyVPC
+
+  InternetGatewayToRouteTable:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+
+
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref MyVPC
+    Export:
+      Name: !Sub ${EnvironmentName}-vpc
+
+  PublicSubnets:
+    Description: A list of the public subnets
+    Value: !Join [ ",", [ !Ref MyPublicSubnet01, !Ref MyPublicSubnet02 ]]
+    Export:
+      Name: !Sub ${EnvironmentName}-PublicSubnets
+
+  PrivateSubnets:
+    Description: A list of the private subnets
+    Value: !Join [ ",", [ !Ref MyPrivateSubnet01, !Ref MyPrivateSubnet02 ]]
+    Export:
+      Name: !Sub ${EnvironmentName}-PrivateSubnets
+
+  PublicSubnet01:
+    Description: A reference to the public subnet in the ap-northeast-1a
+    Value: !Ref MyPublicSubnet01
+    Export:
+      Name: PublicSubnet01id
+
+  PublicSubnet02:
+    Description: A reference to the public subnet in the ap-northeast-1c
+    Value: !Ref MyPublicSubnet02
+    Export:
+      Name: PublicSubnet02id
+
+  PrivateSubnet01:
+    Description: A reference to the public subnet in the ap-northeast-1a
+    Value: !Ref MyPrivateSubnet01
+    Export:
+      Name: PrivateSubnet01id
+
+  PrivateSubnet02:
+    Description: A reference to the public subnet in the ap-northeast-1c
+    Value: !Ref MyPrivateSubnet02
+    Export:
+      Name: PrivateSubnet02id

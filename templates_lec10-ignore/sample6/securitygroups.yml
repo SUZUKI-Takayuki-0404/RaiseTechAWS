@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: lecture10_SecurityGP
+
+Parameters:
+  NameBase:
+    Description: this is base name.
+    Type: String
+    Default: lecture10
+  VPCStackName:
+    Description: VPC stack name.
+    Type: String
+    Default: VPC-Subnets
+  MyIP:
+    Description: IP address allowed to access EC2
+    Type: String
+
+# ------------------------------------------------------------#
+#  EC2SecurityGroup
+# ------------------------------------------------------------#
+
+Resources:
+  lecture10EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub ${NameBase}-sg-ec2 created
+      GroupName: !Sub ${NameBase}-sg-ec2
+      VpcId:
+        Fn::ImportValue: !Sub ${VPCStackName}-vpcid
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+        # SSH(MYIPはセキュリティの観点からハードコードしない)
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-sg-ec2
+
+  # ------------------------------------------------------------#
+  #  RDSSecurityGroup
+  # ------------------------------------------------------------#
+
+  lecture10RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${NameBase}-sg-rds
+      GroupDescription: !Sub ${NameBase}-sg-rds created
+      VpcId:
+        Fn::ImportValue: !Sub ${VPCStackName}-vpcid
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref lecture10EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-sg-rds
+
+  # ------------------------------------------------------------#
+  #  ELBSecurityGroup
+  # ------------------------------------------------------------#
+
+  lecture10ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${NameBase}-sg-elb
+      GroupDescription: !Sub ${NameBase}-sg-elb created
+      VpcId:
+        Fn::ImportValue: !Sub ${VPCStackName}-vpcid
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-sg-elb
+
+# ------------------------------------------------------------#
+#  Outputs
+# ------------------------------------------------------------#
+
+Outputs:
+
+  lecture10EC2SecurityGroup:
+    Value: !Ref lecture10EC2SecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-ec2-securitygp-id"
+
+  lecture10RDSSecurityGroup:
+    Value: !Ref lecture10RDSSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-rds-securitygp-id"
+
+  lecture10ELBSecurityGroup:
+    Value: !Ref  lecture10ELBSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-alb-securitygp-id"

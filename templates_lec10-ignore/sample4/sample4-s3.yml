@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: cloudformations3
+
+Resources:
+  S3cf:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: buckets3-unique-name
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Suspended #一時停止
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced #ACL無効
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256 #SSE-S3

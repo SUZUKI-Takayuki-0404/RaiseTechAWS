@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+# raisetech第10回課題として、VPC作成からunicornとNginxを使ったアプリケーション起動まで
+Description: ALB settings
+
+Parameters:
+  EnvironmentName:
+    Description: Please type the EnvironmentName.
+    Type: String
+    Default: test10
+
+
+Resources:
+  # ==========================================================================
+  # ALB
+  # ==========================================================================
+
+  # セキュリティグループ作成
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: test10-alb-sg-cf
+      GroupDescription: !Sub "${EnvironmentName}-ALBSecurityGroup"
+      VpcId: !ImportValue
+        Fn::Sub: "${EnvironmentName}-vpc"
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-ALBSecurityGroup"
+      SecurityGroupIngress:
+        # ALB
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  # ALB作成
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: "internet-facing"
+      Name: !Sub "${EnvironmentName}-alb"
+      IpAddressType: ipv4
+      Subnets:
+        - !ImportValue PublicSubnet01id
+        - !ImportValue PublicSubnet02id
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-alb"
+
+  # ALBのリスナーを作成、リクエストを受信、そのリクエストをどのターゲットグループに転送するかを決定
+  # Arn=Amazon Resource Nameの略
+  ListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      LoadBalancerArn: !Ref ALB  # このリスナーが関連づけられるALBのARN（Amazon Recource Name）を指定
+      Port: 80
+      Protocol: HTTP
+
+  # ターゲットグループ作成
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${EnvironmentName}-tg"
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200
+      VpcId: !ImportValue
+        Fn::Sub: "${EnvironmentName}-vpc"
+      TargetType: instance
+      Targets:
+        - Id: !ImportValue test10-ec2
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-tg"

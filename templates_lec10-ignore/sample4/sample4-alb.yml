@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CF-ALB
+
+Resources:
+  Albload:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: AlbCF
+      Scheme: "internet-facing"
+      SecurityGroups:
+        - !ImportValue ALBSgcf
+      Subnets:
+        - !ImportValue pub1ao
+        - !ImportValue pub1co
+      Tags:
+        - Key: Name
+          Value: ALBcf
+
+  #targetgroup
+  ALBtarget:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckPort: traffic-port
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      Name: ALBtarget
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      VpcId: !ImportValue VPCo
+      Matcher:
+        HttpCode: 200
+      Tags:
+        - Key: Name
+          Value: AlbcfTaget
+
+  AlblistHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref ALBtarget
+          Type: forward
+      LoadBalancerArn: !Ref Albload

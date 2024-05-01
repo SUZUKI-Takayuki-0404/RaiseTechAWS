@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of IAM for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+  Lecture10RoleS3Access:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: For EC2 to fully access to S3
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      MaxSessionDuration: 3600  #(3600-43200)
+      Path: /
+      RoleName: !Sub ${EnvironmentName}-s3accs-role #Up to 64 characters, upper and lowercase alphanumeric characters with no spaces, and any of the following characters: _+=,.@-.
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-s3accs-role
+
+  Lecture10InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${EnvironmentName}-ist-prf  #regex pattern and any of the following characters: _+=,.@-
+      Path: /
+      Roles:
+        - !Ref Lecture10RoleS3Access
+
+#-----------------------------------------------------------------------------------------------
+Outputs:
+# Naming Rule of Export Name : EnvironmentName(defined in parameters) + Resource Type (+ other identifiers)
+# Without abbreviations such as rt(route table), except for AWS's service name such as VPC
+#-----------------------------------------------------------------------------------------------
+  OutputLecture10InstanceProfile:
+    Description: IAM Instance Profile for S3FullAccess
+    Value: !Ref Lecture10InstanceProfile
+    Export:
+      Name: !Sub ${EnvironmentName}-instance-profile
+
+#  OutputLecture10Role:
+#    Description: IAM Role for FlowLog
+#    Value: !Ref Lecture10RoleFlowLog
+#    Export:
+#      Name: !Sub ${EnvironmentName}-role

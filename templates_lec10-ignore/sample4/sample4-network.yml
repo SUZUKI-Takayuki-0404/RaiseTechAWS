@@ -1,0 +1,180 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: cloudformetion-network
+#vpc
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.7.0/16
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value:
+            vpc-cf
+
+          #InternetGateway
+  IGw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: igw-cf
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId:
+        !Ref IGw
+
+        #subnet-zone-1a
+      #public-1a
+
+  SubnetPublic1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.0.0/20
+      Tags:
+        - Key: Name
+          Value:
+            public-cf-1a
+
+          #private-1a
+
+  SubnetPrivate1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1a"
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.128.0/20
+      Tags:
+        - Key: Name
+          Value:
+            private-cf-1a
+
+            #subnet-zone-1c
+          #public-1c
+
+  SubnetPublic1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.16.0/20
+      Tags:
+        - Key: Name
+          Value:
+            public-cf-1c
+
+          #private-1c
+
+  SubnetPrivate1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.144.0/20
+      Tags:
+        - Key: Name
+          Value:
+            private-cf-1c
+
+          #Routetable pub
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: pub-cf-rt
+  PublicInternet:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        !Ref IGw
+
+      #Routetable pri
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value:
+            pri-cf-rt
+
+          #Association pub
+
+  PubAssociation1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPublic1a
+      RouteTableId: !Ref PublicRouteTable
+  PubAssociation1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPublic1c
+      RouteTableId:
+        !Ref PublicRouteTable
+
+      #Association private
+
+  PrivateAssociation1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPrivate1a
+      RouteTableId: !Ref PrivateRouteTable
+  PrivateAssociation1c:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPrivate1c
+      RouteTableId:
+        !Ref PrivateRouteTable
+
+      #RDSsubnet
+
+  RdsDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: rds_cf
+      SubnetIds:
+        - !Ref SubnetPrivate1a
+        - !Ref SubnetPrivate1c
+      Tags:
+        - Key: Name
+          Value:
+            rds-cf-rds
+
+          #outputs他のスタックから参照
+
+Outputs:
+  Public1a:
+    Value: !Ref SubnetPublic1a
+    Export:
+      Name: "subnet-public-1a"
+
+  Public1c:
+    Value: !Ref SubnetPublic1c
+    Export:
+      Name: "subnet-public-1c"
+
+  Private1a:
+    Value: !Ref SubnetPrivate1a
+    Export:
+      Name: "subnet-private-1a"
+
+  Private1c:
+    Value: !Ref SubnetPrivate1c
+    Export:
+      Name: "subnet-private-1c"
+
+  Vpc:
+    Value: !Ref Vpc
+    Export:
+      Name: "Vpc"

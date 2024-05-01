@@ -1,0 +1,339 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  lecture10template
+
+Resources:
+  # VPC
+  lecture10vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/21
+      Tags:
+        - Key: Name
+          Value: lecture10vpc
+
+  # Public Subnets
+  lecture10publicsubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref lecture10vpc
+      CidrBlock: 10.0.0.0/25
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: lecture10-public1-subnet-us-east-1a
+
+  lecture10publicsubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref lecture10vpc
+      CidrBlock: 10.0.0.128/25
+      AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: lecture10-public2-subnet-us-east-1b
+
+  # Private Subnets
+  lecture10privatsubnets1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref lecture10vpc
+      CidrBlock: 10.0.4.0/25
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: lecture10-privat1-subnets-us-east-1a
+
+  lecture10privatsubnets2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref lecture10vpc
+      CidrBlock: 10.0.4.128/25
+      AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: lecture10-privat2-subnets-us-east-1b
+
+  # InternetGateway
+  lecture10igw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: lecture10igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref lecture10vpc
+      InternetGatewayId: !Ref lecture10igw
+
+  # S3GatewayEndpoint
+  lecture10S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: 'Gateway'
+      VpcId: !Ref lecture10vpc
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+            Resource:
+              - 'arn:aws:s3:::mybucket/*'
+      RouteTableIds:
+        - !Ref lecture10RoutetablePrivate1
+        - !Ref lecture10RoutetablePrivate2
+
+  # PublicRoutetables
+  lecture10RoutetablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref lecture10vpc
+      Tags:
+        - Key: Name
+          Value: lecture10rtb-public
+
+  lecture10PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref lecture10RoutetablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref lecture10igw
+
+  # Subnet Associations
+  publicsubnet1RoutetableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref lecture10publicsubnet1
+      RouteTableId: !Ref lecture10RoutetablePublic
+
+  publicsubnet2RoutetableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref lecture10publicsubnet2
+      RouteTableId: !Ref lecture10RoutetablePublic
+
+  # PrivateRoutetables
+  lecture10RoutetablePrivate1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref lecture10vpc
+      Tags:
+        - Key: Name
+          Value: lecture10rtb-private1-us-east-1a
+
+  lecture10RoutetablePrivate2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref lecture10vpc
+      Tags:
+        - Key: Name
+          Value: lecture10rtb-private2-us-east-1b
+
+  # Subnet Associations
+  PrivateSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref lecture10privatsubnets1
+      RouteTableId: !Ref lecture10RoutetablePrivate1
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref lecture10privatsubnets2
+      RouteTableId: !Ref lecture10RoutetablePrivate2
+
+  # SecurityGroups
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EC2SecurityGroup Allow SSH and HTTP access
+      GroupName: lecture10ec2sec
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      # SecurityGroupEgress:は全て許可の為省略しています。
+      Tags:
+        - Key: Name
+          Value: lecture10ec2sec
+      VpcId: !Ref lecture10vpc
+
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  ALBSecurityGroup Allow HTTP access
+      GroupName: lecture10albsec
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      # SecurityGroupEgress:は全て許可の為省略しています。
+      Tags:
+        - Key: Name
+          Value: lecture10albsec
+      VpcId: !Ref lecture10vpc
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription:  allow lecture10ec2sec
+      GroupName: lecture10rdssec
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+      # SecurityGroupEgress:は全て許可の為省略しています。
+      Tags:
+        - Key: Name
+          Value: lecture10rdssec
+      VpcId: !Ref lecture10vpc
+
+  # KeyPair
+  lecture10KeyPair:
+    Type: 'AWS::EC2::KeyPair'
+    Properties:
+      KeyName: lecture10KeyPair
+      Tags:
+        - Key: Name
+          Value: lecture10keypair
+
+
+  # EC2Instance
+  lecture10EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1b
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 8
+            VolumeType: gp2
+      ImageId: ami-07761f3ae34c4478d
+      InstanceType: t2.micro
+      KeyName: !Ref lecture10KeyPair
+      Tenancy: default
+      InstanceInitiatedShutdownBehavior: stop
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          SubnetId: !Ref lecture10publicsubnet2
+          GroupSet:
+            - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: lecture10ec2instance
+
+
+  # DB SubnetGroup
+  lecture10DBSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: lecture10DBSubnetGroup
+      SubnetIds:
+        - !Ref lecture10privatsubnets1
+        - !Ref lecture10privatsubnets2
+      DBSubnetGroupName: lecture10DBSubnetGroup
+      Tags:
+        - Key: Name
+          Value: lecture10dbsubnetgroup
+
+
+  # DB Instance
+  lecture10DBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: lecture10db
+      DBName: lecture10DBInstance
+      DBSubnetGroupName:
+        !Ref lecture10DBSubnetGroup
+      Engine: mysql
+      EngineVersion: 8.0.35
+      MasterUsername: oyatsu
+      MasterUserPassword: lecture10rds
+      StorageType: gp2
+      Tags:
+        - Key: Name
+          Value: lecture10dbinstance
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+
+  # ALB TargetGroup
+  lecture10TG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${AWS::StackName}-tg
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-tg
+      Port: 80
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200
+      VpcId: !Ref lecture10vpc
+      TargetType: instance
+      Targets:
+        - Id: !Ref lecture10EC2Instance
+
+  # ALB Listener
+  lecture10ListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref lecture10TG
+      LoadBalancerArn: !Ref lecture10ALB
+      Port: 80
+      Protocol: HTTP
+
+  # ALB
+  lecture10ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub ${AWS::StackName}-alb
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Subnets:
+        - !Ref lecture10publicsubnet1
+        - !Ref lecture10publicsubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-alb
+      Type: application
+
+
+  # S3
+  lecture10bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: lecture10bucket
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256

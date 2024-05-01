@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of RDS for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10a
+
+  MasterUsernameRDSInstance:
+    Description: 1) Must be 1 to 16 letters or numbers. 2) First character must be a letter. 3) Can't be a reserved word for the chosen database engine.
+    Type: String
+    Default: admin
+
+  MasterUserPasswordRDSInstance:
+    Description: 1) ASCII character except "/", """, or "@". 2) Must contain from 8 to 41 characters
+    Type: String
+    Default: password
+    NoEcho: true  #To hide a password from a console, command line tools and APIs
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+  Lecture10DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet Group for RDS
+      DBSubnetGroupName: !Sub ${EnvironmentName}-db-sng
+      SubnetIds: #Must add subnets to cover at least 2 AZs
+        - Fn::ImportValue:
+            !Sub ${EnvironmentName}-subnet-private1
+        - Fn::ImportValue:
+            !Sub ${EnvironmentName}-subnet-private2
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-db-sng
+
+  Lecture10DBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      AutoMinorVersionUpgrade: false
+      AvailabilityZone: ap-northeast-1a
+      BackupRetentionPeriod: 0
+      CopyTagsToSnapshot: false
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: !Sub ${EnvironmentName}-rdb
+      DBName: !Sub ${EnvironmentName}rdb #Must begin with a letter and contain only alphanumeric characters
+      DBSubnetGroupName: !Ref Lecture10DBSubnetGroup
+      Engine: mysql
+      EngineVersion: 8.0.35
+      LicenseModel: general-public-license
+      MasterUsername: !Ref MasterUsernameRDSInstance
+      MasterUserPassword: !Ref MasterUserPasswordRDSInstance
+      MultiAZ: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-rds
+      VPCSecurityGroups:  #If you set VPCSecurityGroups, you must not set DBSecurityGroups, and vice versa.
+        - Fn::ImportValue:
+            !Sub ${EnvironmentName}-security-group-rds

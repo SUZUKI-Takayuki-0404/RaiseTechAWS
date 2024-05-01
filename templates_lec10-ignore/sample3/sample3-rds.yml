@@ -1,0 +1,73 @@
+#参照元（https://zenn.dev/mjxo/articles/9d68410e2c624f）
+#公式ドキュメント（https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbinstance.html#cfn-rds-dbinstance-allocatedstorage）
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Create RDS
+#Metadata:
+Parameters:
+
+  MasterUserPassword:
+    Type: String
+    Description: Password string for master user of DB Instance
+    NoEcho: true
+
+Resources:
+  #------------SG----------------------------------
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS SG
+      VpcId: !ImportValue VPC-ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !ImportValue EC2SecurityGroup-ID
+      GroupName: !Sub ${AWS::StackName}-sg
+      Tags:
+        - Key: Name
+          Value: !Sub  ${AWS::StackName}-sg
+
+  #------------SubnetGroup--------------------------
+
+  SubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS subnetgroup
+      DBSubnetGroupName: !Sub ${AWS::StackName}-subnetgroup
+      SubnetIds:
+        - !ImportValue PrivateSubnet-A-ID
+        - !ImportValue PrivateSubnet-C-ID
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-subnetgroup
+
+
+  #------------RDS----------------------------------
+
+  myRDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      AllowMajorVersionUpgrade: true
+      AvailabilityZone: ap-northeast-1c
+      BackupRetentionPeriod: 1
+      CopyTagsToSnapshot: true
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: CFn-database-2-tokyo-2
+      DBName: CFnRDS
+      DBSubnetGroupName: !Ref SubnetGroup
+      Engine: mysql
+      EngineVersion: 8.0.35
+      LicenseModel: general-public-license
+      ManageMasterUserPassword: false
+      MasterUsername: admin
+      MasterUserPassword: !Ref MasterUserPassword
+      Port: 3306
+      PubliclyAccessible: true
+      StorageEncrypted: true
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup

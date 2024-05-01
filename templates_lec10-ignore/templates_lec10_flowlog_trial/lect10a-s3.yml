@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of S3 for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10a
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+  Lecture10Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256 #(SSE-S3) (aws:kms | AES256 | aws:kms:dsse)
+      BucketName: !Sub ${EnvironmentName}-s3  #Must contain only lowercase letters, numbers, periods (.), and dashes (-) and must follow Amazon S3 bucket restrictions and limitations.
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced #(ObjectWriter | BucketOwnerPreferred | BucketOwnerEnforced)
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-s3
+      VersioningConfiguration:
+        Status: Suspended #(Enabled | Suspended)

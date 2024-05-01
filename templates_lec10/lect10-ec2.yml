@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of EC2(incl. IAM resources to access S3) for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+  # Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10
+
+  KeyNameEC2:
+    Description: Key Pair associated when launching EC2
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: XXXX-pem
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+  Lecture10EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      IamInstanceProfile: !Ref Lecture10InstanceProfile
+      ImageId: ami-05b37ce701f85f26a
+      InstanceInitiatedShutdownBehavior: stop #(stop | terminate)
+      InstanceType: t2.micro
+      KeyName: !Ref KeyNameEC2
+      Monitoring: False
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          Description: EC2 Instance for Lecture10
+          DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue:
+                !Sub ${EnvironmentName}-security-group-ec2
+          SubnetId:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-subnet-public1
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-ec2
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install mysql -y
+
+  Lecture10RoleS3Access:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: For EC2 to fully access to S3
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      MaxSessionDuration: 3600  #(3600-43200)
+      Path: /
+      RoleName: !Sub ${EnvironmentName}-s3accs-role #Up to 64 characters, upper and lowercase alphanumeric characters with no spaces, and any of the following characters: _+=,.@-.
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-s3accs-role
+
+  Lecture10InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${EnvironmentName}-ist-prf  #regex pattern and any of the following characters: _+=,.@-
+      Path: /
+      Roles:
+        - !Ref Lecture10RoleS3Access
+
+#-----------------------------------------------------------------------------------------------
+Outputs:
+# Naming Rule of Export Name : EnvironmentName(defined in parameters) + Resource Type (+ other identifiers)
+# Without abbreviations such as rt(route table), except for AWS's service name such as VPC
+#-----------------------------------------------------------------------------------------------
+  OutputLecture10InstanceEC2:
+    Description: EC2 Instance output
+    Value: !Ref Lecture10EC2
+    Export:
+      Name: !Sub ${EnvironmentName}-instance-ec2

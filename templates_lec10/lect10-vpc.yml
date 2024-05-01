@@ -1,0 +1,265 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of VPC(incl. IGW and Subnets) and Security Groups for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10
+
+  MyIPAddress:
+    Description: CIDR for "My IP Address"
+    Type: String
+    Default: XXX.XXX.XXX.XXX/XX
+
+  AvailabilityZone1:
+    Description: Availability Zone 1
+    Type: String
+    Default: ap-northeast-1a
+
+  AvailabilityZone2:
+    Description: Availability Zone 2
+    Type: String
+    Default: ap-northeast-1c
+
+  CIDRBlockVPC:
+    Description: CIDR for VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  CIDRBlockSubnetPublic1:
+    Description: CIDR for Public Subnet 1
+    Type: String
+    Default: 10.0.0.0/20
+
+  CIDRBlockSubnetPublic2:
+    Description: CIDR for Public Subnet 2
+    Type: String
+    Default: 10.0.16.0/20
+
+  CIDRBlockSubnetPrivate1:
+    Description: CIDR for Private Subnet 1
+    Type: String
+    Default: 10.0.128.0/20
+
+  CIDRBlockSubnetPrivate2:
+    Description: CIDR for Private Subnet 2
+    Type: String
+    Default: 10.0.144.0/20
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+
+#----VPC & IGW----
+  Lecture10VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Sub ${CIDRBlockVPC}
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-vpc
+
+  Lecture10InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-igw
+
+  Lecture10VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      InternetGatewayId: !Ref Lecture10InternetGateway
+
+#----Route Tables----
+  Lecture10RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-public-rtb
+
+  Lecture10Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref Lecture10RouteTablePublic
+      GatewayId: !Ref Lecture10InternetGateway
+      DestinationCidrBlock: 0.0.0.0/0
+
+#----Subnets----
+  Lecture10SubnetPublic1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      CidrBlock: !Sub ${CIDRBlockSubnetPublic1}
+      AvailabilityZone: !Sub ${AvailabilityZone1}
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-pbl1-sbn
+
+  Lecture10SubnetPublic2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      CidrBlock: !Sub ${CIDRBlockSubnetPublic2}
+      AvailabilityZone: !Sub ${AvailabilityZone2}
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-pbl2-sbn
+
+  Lecture10SubnetPrivate1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      CidrBlock: !Sub ${CIDRBlockSubnetPrivate1}
+      AvailabilityZone: !Sub ${AvailabilityZone1}
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-prv1-sbn
+
+  Lecture10SubnetPrivate2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Lecture10VPC
+      CidrBlock: !Sub ${CIDRBlockSubnetPrivate2}
+      AvailabilityZone: !Sub ${AvailabilityZone2}
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-prv2-sbn
+
+  Lecture10SubnetRouteTableAssociationPublic1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Lecture10SubnetPublic1
+      RouteTableId: !Ref Lecture10RouteTablePublic
+
+  Lecture10SubnetRouteTableAssociationPublic2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Lecture10SubnetPublic2
+      RouteTableId: !Ref Lecture10RouteTablePublic
+
+#----Security Groups----
+  Lecture10SecurityGroupEC2:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enabler for access only by SSH and HTTP
+      GroupName: !Sub ${EnvironmentName}-ec2-sg
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIPAddress
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref MyIPAddress
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-ec2-sg
+      VpcId: !Ref Lecture10VPC
+
+  Lecture10SecurityGroupRDS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enabler for access only by MYSQL/Aurora
+      GroupName: !Sub ${EnvironmentName}-rds-sg
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref Lecture10SecurityGroupEC2
+      Tags:
+        - key: Name
+          Value: !Sub ${EnvironmentName}-rds-sg
+      VpcId: !Ref Lecture10VPC
+
+  Lecture10SecurityGroupALB:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enabler for access only by HTTP
+      GroupName: !Sub ${EnvironmentName}-alb-sg
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIP: !Ref MyIPAddress
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-alb-sg
+      VpcId: !Ref Lecture10VPC
+
+#-----------------------------------------------------------------------------------------------
+Outputs:
+# Naming Rule of Export Name : EnvironmentName(defined in parameters) + Resource Type (+ other identifiers)
+# Without abbreviations such as rt(route table), except for AWS's service name such as VPC
+#-----------------------------------------------------------------------------------------------
+  OutputLecture10AvailabilityZone1:
+    Description: Availability Zone 1
+    Value: !GetAtt Lecture10SubnetPublic1.AvailabilityZone
+    Export:
+      Name: !Sub ${EnvironmentName}-availability-zone1
+
+  OutputLecture10AvailabilityZone2:
+    Description: Availability Zone 2
+    Value: !GetAtt Lecture10SubnetPublic2.AvailabilityZone
+    Export:
+      Name: !Sub ${EnvironmentName}-availability-zone2
+
+  OutputLecture10VPC:
+    Description: VPC output
+    Value: !Ref Lecture10VPC
+    Export:
+      Name: !Sub ${EnvironmentName}-vpc
+
+  OutputLecture10PublicSubnet1:
+    Description: Public Subnet 1 output
+    Value: !Ref Lecture10SubnetPublic1
+    Export:
+      Name: !Sub ${EnvironmentName}-subnet-public1
+
+  OutputLecture10PublicSubnet2:
+    Description: Public Subnet 2 output
+    Value: !Ref Lecture10SubnetPublic2
+    Export:
+      Name: !Sub ${EnvironmentName}-subnet-public2
+
+  OutputLecture10PrivateSubnet1:
+    Description: Private Subnet 1 output
+    Value: !Ref Lecture10SubnetPrivate1
+    Export:
+      Name: !Sub ${EnvironmentName}-subnet-private1
+
+  OutputLecture10PrivateSubnet2:
+    Description: Private Subnet 2 output
+    Value: !Ref Lecture10SubnetPrivate2
+    Export:
+      Name: !Sub ${EnvironmentName}-subnet-private2
+
+  OutputLecture10SecurityGroupEC2:
+    Description: Security Group Output for EC2
+    Value: !Ref Lecture10SecurityGroupEC2
+    Export:
+      Name: !Sub ${EnvironmentName}-security-group-ec2
+
+  OutputLecture10SecurityGroupRDS:
+    Description: Security Group Output for RDS
+    Value: !Ref Lecture10SecurityGroupRDS
+    Export:
+      Name: !Sub ${EnvironmentName}-security-group-rds
+
+  OutputLecture10SecurityGroupALB:
+    Description: Security Group Output for ALB
+    Value: !Ref Lecture10SecurityGroupALB
+    Export:
+      Name: !Sub ${EnvironmentName}-security-group-alb

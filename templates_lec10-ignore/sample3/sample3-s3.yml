@@ -1,0 +1,68 @@
+#!削除できるのは空のバケットのみ。コンテンツが含まれているバケットの削除は失敗する。
+#公式ドキュメント参照。（https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html）
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description:
+  Create S3 IAMrole
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: cfn-s3-20240314
+
+Resources:
+
+  #--------------------IAMRole------------------------------
+
+  MyS3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  #--------------------InstanceProfile-----------------------
+
+  MyEC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref MyS3AccessRole
+
+
+  #---------------s3bucket--------------------------------
+
+  myS3bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccelerateConfiguration:
+        AccelerationStatus: Suspended
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+      BucketName: !Ref BucketName
+      ObjectLockEnabled: false
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+#-----------------------outputs-----------------------
+
+Outputs:
+  MyEC2InstanceProfile:
+    Value: !Ref MyEC2InstanceProfile
+    Export:
+      Name: S3AccessRole

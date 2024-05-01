@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Template of CloudWatch FlowLog(incl. IAM Role) and Alarm(incl. SNS Topics and Subscriptions) for Lecture10
+
+#-----------------------------------------------------------------------------------------------
+Parameters:
+# Naming Rule of Parameters: Property name(defined in Resources) + Resource Type (+ other identifiers)
+# Other identifiers mean Resource Type in parent layer, ID-number etc. for example
+#-----------------------------------------------------------------------------------------------
+  EnvironmentName:
+    Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
+    Type: String
+    Default: lecture10a
+
+  EmailAddress:
+    Description: Email address for Simple Notification Service
+    Type: String
+    Default: tk.suzuki.0404+raisetechaws@gmail.com
+
+#-----------------------------------------------------------------------------------------------
+Resources:
+# Naming Rule of logical IDs: EnvironmentName + Resource Type (+ other identifiers)
+# Naming Rule of Tags Name's Value: EnvironmentName (+ other identifiers) + Resource Type(abbreviations)
+#-----------------------------------------------------------------------------------------------
+
+#----FlowLog----
+  Lecture10FlowLogs:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt Lecture10RoleFlowLog.Arn
+      LogDestinationType: cloud-watch-logs  #(cloud-watch-logs | s3 | kinesis-data-firehose)
+      LogGroupName: !Ref Lecture10LogGroup
+      ResourceId:   #if the resource type is VPC, specify the ID of the VPC.
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-network-interface
+      ResourceType: NetworkInterface  #(NetworkInterface | Subnet | VPC | TransitGateway | TransitGatewayAttachment)
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-flwlg
+      TrafficType: ALL  #(ACCEPT, REJECT, ALL)
+
+  Lecture10LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupClass: STANDARD #(STANDARD | INFREQUENT_ACCESS)
+      LogGroupName: !Sub ${EnvironmentName}-lggrp
+      RetentionInDays: 90 # (1 | 3 | 5 | 7 | 14 | 30 | 60 | 90 | 120 | 150 | 180 | 365 | 400 | 545 | 731 | 1096 | 1827 | 2192 | 2557 | 2922 | 3288 | 3653)
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-lggrp
+
+  Lecture10RoleFlowLog:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - vpc-flow-logs.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: To store logs in CloudWatch Logs
+      MaxSessionDuration: 3600  #(3600-43200)
+      Path: /
+      Policies:
+        - PolicyName: !Sub ${EnvironmentName}-flwlg-plcy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:CreateLogGroup
+                  - logs:PutLogEvents
+                Resource: "*"
+      RoleName: !Sub ${EnvironmentName}-flwlgs-role
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-flwlgs-role
+
+#----Alarm----
+  Lecture10AlarmUnHealthy:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: false
+      AlarmActions:
+        - !GetAtt Lecture10TopicUnHealthy.TopicArn
+      AlarmDescription: |-
+        # Alert
+        This is to notify you that an  App. ALB is issuing an ALERT. 
+        Check it and take countermeasure promptly.
+      AlarmName: !Sub ${EnvironmentName}-alrm-unhlty
+      ComparisonOperator: GreaterThanOrEqualToThreshold  #(GreaterThanOrEqualToThreshold | GreaterThanThreshold | LessThanThreshold | LessThanOrEqualToThreshold | LessThanLowerOrGreaterThanUpperThreshold | LessThanLowerThreshold | GreaterThanUpperThreshold)
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: AvailabilityZone
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-availability-zone1
+        - Name: TargetGroup
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-target-group
+        - Name: LoadBalancer
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-load-balancer
+      EvaluationPeriods: 1
+      InsufficientDataActions: []
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ApplicationELB
+      OKActions: []
+      Period: 60  #(10, 30, 60, and any multiple of 60)
+      Statistic: Average  #(SampleCount | Average | Sum | Minimum | Maximum)
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-alrm-unhlty
+      Threshold: 1
+      TreatMissingData: missing
+
+  Lecture10AlarmHealthy:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: false
+      AlarmActions: []
+      AlarmDescription: |-
+        # Information
+        This is to inform you that an App. ALB is now working properly.
+      AlarmName: !Sub ${EnvironmentName}-alrm-hlty
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      DatapointsToAlarm: 1
+      Dimensions:
+        - Name: AvailabilityZone
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-availability-zone1
+        - Name: TargetGroup
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-target-group
+        - Name: LoadBalancer
+          Value:
+            Fn::ImportValue:
+              !Sub ${EnvironmentName}-load-balancer
+      EvaluationPeriods: 1
+      InsufficientDataActions: []
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ApplicationELB
+      OKActions:
+        - !GetAtt Lecture10TopicHealthy.TopicArn
+      Period: 60
+      Statistic: Average
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-alrm-hlty
+      Threshold: 1
+      TreatMissingData: missing
+
+#----Simple Notification Service----
+  Lecture10TopicUnHealthy:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${EnvironmentName} UnHealthy  #Maximum 100 characters long, including "-", "_", spaces, and tabs
+      Subscription:
+        - Endpoint: !Sub ${EmailAddress}
+          Protocol: email
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-tpc-unhlthy
+      TopicName: !Sub ${EnvironmentName}-Topic-UnHealthy  #Must include only uppercase and lowercase ASCII letters, numbers, underscores, and hyphens, and must be between 1 and 256 characters long. FIFO topic names must end with .fifo.
+
+  Lecture10TopicHealthy:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub ${EnvironmentName} Healthy  #Maximum 100 characters long, including "-", "_", spaces, and tabs
+      Subscription:
+        - Endpoint: !Sub ${EmailAddress}
+          Protocol: email
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-tpc-hlthy
+      TopicName: !Sub ${EnvironmentName}-Topic-Healthy  #Must include only uppercase and lowercase ASCII letters, numbers, underscores, and hyphens, and must be between 1 and 256 characters long. FIFO topic names must end with .fifo.

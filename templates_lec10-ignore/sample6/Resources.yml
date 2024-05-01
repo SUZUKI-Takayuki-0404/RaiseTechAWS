@@ -1,0 +1,196 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EC2 RDS ALB S3 create
+
+#-----------------------------------
+# Parameters
+#-----------------------------------
+Parameters: # Parameters Start
+
+  NameBase:
+    Description: base name
+    Type: String
+    Default: "lecture10"
+  SGStackName:
+    Description: SecurityGroup stack name.
+    Type: String
+    Default: SGsetting
+  VPCStackName:
+    Description: VPC stack name.
+    Type: String
+    Default: VPC-Subnets
+  EC2KeyName:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: "AWS::EC2::KeyPair::KeyName"
+  DBMasterUserName:
+    Type: String
+    Default: admin
+  DBPassword:
+    # パラメータ値をマスク
+    NoEcho: true
+    Description: RDS Master User Password
+    Type: String
+
+# Resources Start
+Resources:
+  #-----------------------------------
+  # IAM Role
+  #-----------------------------------
+  lecture10S3accessRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+      Path: /
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-S3AccessRole
+
+  lecture10EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref lecture10S3accessRole
+  #-----------------------------------
+  # EC2 Instance
+  #-----------------------------------
+  lecture10EC2:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      KeyName: !Ref EC2KeyName
+      ImageId: ami-05b37ce701f85f26a
+      InstanceType: t2.micro
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: "0"
+          GroupSet:
+            - Fn::ImportValue: !Sub ${SGStackName}-ec2-securitygp-id
+          SubnetId:
+            Fn::ImportValue: !Sub ${VPCStackName}-public-subnet-a-id
+      IamInstanceProfile: !Ref lecture10EC2InstanceProfile
+      Tags:
+        - Key: Name
+          Value: !Sub "${NameBase}-ec2"
+
+  #-----------------------------------
+  # RDSSubnetGroup
+  #-----------------------------------
+
+  lecture10RDSSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupName: !Sub ${NameBase}-rds-SubnetGroup
+      DBSubnetGroupDescription: !Sub ${NameBase}-rds-SubnetGroup created
+      SubnetIds:
+        - Fn::ImportValue: !Sub ${VPCStackName}-private-subnet-a-id
+        - Fn::ImportValue: !Sub ${VPCStackName}-private-subnet-c-id
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${NameBase}-rds-SubnetGroup"
+
+  #-----------------------------------
+  # RDS
+  #-----------------------------------
+
+  lecture10RDS:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref AWS::Region
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: !Sub ${NameBase}-rds
+      DBSubnetGroupName: !Ref lecture10RDSSubnetGroup
+      Engine: MySQL
+      EngineVersion: 8.0.35
+      MasterUsername: !Ref DBMasterUserName
+      MasterUserPassword: !Ref DBPassword
+      MultiAZ: false
+      PubliclyAccessible: false
+      StorageEncrypted: false
+      StorageType: gp2
+      VPCSecurityGroups:
+        - Fn::ImportValue: !Sub ${SGStackName}-rds-securitygp-id
+      BackupRetentionPeriod: 0
+
+  #-----------------------------------
+  # ALB
+  #-----------------------------------
+
+  lecture10ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: "application"
+      Scheme: "internet-facing"
+      Name: !Sub ${NameBase}-alb
+      IpAddressType: ipv4
+      Subnets:
+        - Fn::ImportValue: !Sub ${VPCStackName}-private-subnet-a-id
+        - Fn::ImportValue: !Sub ${VPCStackName}-private-subnet-c-id
+      SecurityGroups:
+        - Fn::ImportValue: !Sub ${SGStackName}-alb-securitygp-id
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-alb
+
+  ListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref lecture10ALBTargetGroup
+      LoadBalancerArn: !Ref lecture10ALB
+      Port: 80
+      Protocol: HTTP
+
+  lecture10ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${NameBase}-TargetGroup
+      Port: 80
+      Protocol: HTTP
+      ProtocolVersion: HTTP1
+      VpcId:
+        Fn::ImportValue: !Sub ${VPCStackName}-vpcid
+      TargetType: instance
+      Targets:
+        - Id: !Ref lecture10EC2
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-TargetGroup
+
+  #-----------------------------------
+  # S3
+  #-----------------------------------
+
+  lecture10S3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-lecture10
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Suspended
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameBase}-s3

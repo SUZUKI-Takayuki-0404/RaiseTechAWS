@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+# raisetech第10回課題として、VPC作成からunicornとNginxを使ったアプリケーション起動まで
+Description: Create S3
+
+Parameters:
+  EnvironmentName:
+    Description: Please type the EnvironmentName.
+    Type: String
+    Default: test10
+
+Resources:
+  # ==========================================================================
+  # S3
+  # ==========================================================================
+
+  # バケット作成
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: test10-s3
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Suspended
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub "${EnvironmentName}-Lifecycle-s3bucket"
+            Status: Enabled
+            ExpirationInDays: 30
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-s3"
+
+
+  # アクセスロール
+  S3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+
+  # アクセスポリシー
+  S3AccessPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: AmazonS3FullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:ListAllMyBuckets"
+              - "s3:GetBucketLocation"
+            Resource: "arn:aws:s3:::*"
+          - Effect: Allow
+            Action:  "*"
+            Resource:
+              - "arn:aws:s3:::test10-s3"
+              - "arn:aws:s3:::test10-s3/*"
+      Roles:
+        - !Ref S3AccessRole
+
+
+  # EC2インスタンスとロールを紐付けるのに、IAMインスタンスプロファイルを記述
+  S3AccessInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref S3AccessRole
+
+
+Outputs:
+  #  EC2インスタンスにIAMインスタンスロールを付与するために記述
+  S3AccessInstanceProfile:
+    Value: !Ref S3AccessInstanceProfile
+    Export:
+      Name: test10-S3AccessInstanceProfile
