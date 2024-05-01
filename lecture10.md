@@ -2,7 +2,7 @@
 
 ## 実施内容
 
-CloudFormation を利用して、これまで主導で作った環境をコード化
+CloudFormation を利用して、これまで手動で作った環境をコード化
 
 ### 構成図
 
@@ -10,14 +10,17 @@ CloudFormation を利用して、これまで主導で作った環境をコー�
 
 ### Templateファイル
 
+- 分かりやすさの観点から、なるべくEC2・RDS等のサービス単位でテンプレートファイル作成
+- クロススタックによるテンプレートファイル間の変数依存を必要最小限とすべく、変数の参照・被参照のあるリソースはなるべく同一テンプレートファイル内に記述
+
 |Template File|Contents|
 |--|--|
-|[lect10-vpc.yml](templates_lec10/lect10-vpc.yml)|VPC、IGW、Security Group|
-|[lect10-ec2.yml](templates_lec10/lect10-ec2.yml)|EC2 Instance, Network Interface|
-|[lect10-alb.yml](templates_lec10/lect10-alb.yml)|ALB, Listener, Target Group|
-|[lect10-rds.yml](templates_lec10/lect10-rds.yml)|RDS, DB Subnet Group|
-|[lect10-s3.yml](templates_lec10/lect10-s3.yml)|S3、IAM Instance Profile、IAM Role(S3 Access)|
-|[lect10-cw.yml](templates_lec10/lect10-cw.yml)|Cloud Watch Logs、IAM Role(FlowLog)|
+|[lect10-vpc.yml](templates_lec10/lect10-vpc.yml)|VPC, IGW、Route Table, Subnet, Security Group|
+|[lect10-ec2.yml](templates_lec10/lect10-ec2.yml)|EC2 Instance, Instance Profile, IAM Role(for access to S3)|
+|[lect10-alb.yml](templates_lec10/lect10-alb.yml)|ALB, Target Group, Listener|
+|[lect10-rds.yml](templates_lec10/lect10-rds.yml)|RDS Instance, DB Subnet Group|
+|[lect10-s3.yml](templates_lec10/lect10-s3.yml)|S3|
+|[lect10-cw.yml](templates_lec10/lect10-cw.yml)|CloudWatch Alarm、SNS Topic, Subscription|
 
 
 ### 実行結果詳細
@@ -78,7 +81,7 @@ CloudFormation を利用して、これまで主導で作った環境をコー�
 
 
 ## その他
-  - 追加として、第8回講座で説明されたEC2ネットワークインターフェイスへのフローログ設定もテンプレート反映にチャレンジしたが、以下経緯から現状困難と判断。
+  - 第8回講座で説明されたEC2ネットワークインターフェイスへのフローログ設定もテンプレート反映にチャレンジしたが、以下経緯からEC2インスタンス開始時のパブリックIPアドレス関連付けが不可と判断し断念。
     - フローログのプロパティにはネットワークインターフェイスIDが必要　＜\[1\]参照＞  
       [lect10-cw-with-flowlog.yml](templates_lec10/lect10-cw-with-flowlog.yml)
       ```yml
@@ -97,7 +100,7 @@ CloudFormation を利用して、これまで主導で作った環境をコー�
               Value: !Sub ${EnvironmentName}-flwlg
           TrafficType: ALL
       ```
-    - ネットワークインターフェイスのID取得には、EC2インスタンスとは別途作成が必要（GetAtt関数もネットワークインターフェイスIDの出力は対応していない）　＜\[2\]参照＞
+    - ネットワークインターフェイスのID取得には、EC2インスタンスとは別途作成が必要（GetAtt関数でもネットワークインターフェイスIDの出力できない）　＜\[2\]参照＞
     - 別途作成したネットワークインターフェイスを付与する場合、EC2インスタンスへのパブリックIPアドレス関連付けが不可能（Elastic IPの関連付けは可能だが、これまでの課題で作成した環境と異なってしまう）　＜\[3\]参照＞  
       [lect10-ec2-with-flowlog.yml](templates_lec10/lect10-ec2-with-flowlog.yml)  
       ```yml
