@@ -15,12 +15,12 @@ CloudFormation を利用して、これまで手動で作った環境をコー�
 
 |Template File|Resources|
 |--|--|
-|[lect10-vpc.yml](templates_lec10/lect10-vpc.yml)|VPC, IGW、Route Table, Subnet, Security Group|
+|[lect10-vpc.yml](templates_lec10/lect10-vpc.yml)|VPC, IGW, Route Table, Subnet, Security Group|
 |[lect10-ec2.yml](templates_lec10/lect10-ec2.yml)|EC2 Instance, Instance Profile, IAM Role(for access to S3)|
 |[lect10-alb.yml](templates_lec10/lect10-alb.yml)|Load Balancer, Target Group, Listener|
 |[lect10-rds.yml](templates_lec10/lect10-rds.yml)|RDS Instance, DB Subnet Group|
 |[lect10-s3.yml](templates_lec10/lect10-s3.yml)|S3|
-|[lect10-cw.yml](templates_lec10/lect10-cw.yml)|CloudWatch Alarm、SNS Topic, Subscription|
+|[lect10-cw.yml](templates_lec10/lect10-cw.yml)|CloudWatch Alarm, SNS Topic, Subscription|
 
 
 ### 実行結果詳細
@@ -133,7 +133,7 @@ CloudFormation を利用して、これまで手動で作った環境をコー�
         ``` 
 
   - 作成結果\(EC2インスタンス開始時にパブリックIPアドレスが付与されない\)  
-    ![図](images_lec10/extr-1_NetworkInterfaceAttach.PNG)   
-    ![図](images_lec10/extr-2_LogGroup.PNG)   
-    ![図](images_lec10/extr-3_EC2start.PNG)   
-    ![図](images_lec10/extr-4_NoPublicIP.PNG)   
+    ![図](images_lec10/extr-1_NetworkInterfaceAttach.PNG)  
+    ![図](images_lec10/extr-2_LogGroup.PNG)  
+    ![図](images_lec10/extr-3_EC2start.PNG)  
+    ![図](images_lec10/extr-4_NoPublicIP.PNG)  
