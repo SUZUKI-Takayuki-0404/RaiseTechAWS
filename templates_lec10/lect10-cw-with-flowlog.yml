@@ -15,7 +15,7 @@ Parameters:
   EmailAddress:
     Description: Email address for Simple Notification Service
     Type: String
-    Default: tk.suzuki.0404+raisetechaws@gmail.com
+    Default: xxxx@yyyy.com
 
 #-----------------------------------------------------------------------------------------------
 Resources:
