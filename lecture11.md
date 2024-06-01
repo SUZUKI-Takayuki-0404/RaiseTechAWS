@@ -2,7 +2,7 @@
 
 ## 実施内容
 
-ServerSpec のテスト[サンプルコード](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/serverspec)をカスタマイズしたうえで、テストを成功させる
+Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/serverspec)をカスタマイズしたうえで、テストを成功させる
 
 
 ### テストコード
@@ -112,14 +112,18 @@ unicorn -v
 
 ## 所感
 
-  - 構築したい環境に対し、予めどんな確認事項（＝テスト項目）が要るか洗い出しておくことで、今回のようにテストの自動化をはかることで手戻り削減につながる。  
-  - 今回の手戻り事例：テスト実行時の予期せぬエラーの解決に多大な時間（６作業日）を要した  
-    - 事象  
-      - Bundler、Rails、Unicornのバージョン確認時、コマンドライン入力では正しく出力されているがServerspecでは出力されない。Serverspecの環境変数が関係すると考え、whichコマンドで環境変数のパス確認結果も不一致のエラー表示。  
+  - 構築したい環境について予めどのような確認事項（＝テスト項目）が要るか洗い出しておき、インストール直後に自動テストすることで、後から問題発覚で工数大幅ロスを防げる。  
+  - 今回の手戻り事例：
+    - テスト実行時のエラー解決に多大な時間（８作業日）を要した。
+    - 途中からChatGPT使用し、狭い知識範囲で思いつきの解決策ではなく、より広範な知識に基づく多種多様かつ網羅的な解決策を検討できた。  
+    - 事象：  
+      - Bundlerのバージョン確認時、コマンドライン手入力では正しく出力されているが、Serverspecでは別バージョンが表示。
+      - Serverspecの環境変数が関係すると考え、Bundlerについてwhichコマンドで確認すると、パスが不一致。  
         ![図](images_lec11/3-4_test_failed_which_bundle.PNG)  
-        ![図](images_lec11/3-16-3_unicorn_test_trial_result2.PNG)  
-    - 処置  
-      - whichコマンドの問題は、期待値（出力結果）のパスに使っていたチルダ（ホームディレクトリ）をフルパス表記に置換することで解決  
+      - Rails、Unicornのバージョン確認時、コマンドライン手入力では正しく出力されているが、Serverspecでは出力されない。
+      - ![図](images_lec11/3-16-3_unicorn_test_trial_result2.PNG)  
+    - 処置：  
+      - whichコマンドの問題は、期待値（出力結果）のパスに使っていたチルダ（ホームディレクトリ）をフルパス表記に置換することで解決。（＝テストコード不備でありバージョンの問題とは無関係）  
         ![図](images_lec11/3-4-2_bundler_path.PNG)  
         ![図](images_lec11/3-4-3_bundler_path_pass.PNG)  
       - Bundlerについては、Serverspecはdefault versionを参照していることがわかり、gemのバージョンを変更することでbundlerのデフォルトバージョンを整合させて解決  
@@ -128,3 +132,14 @@ unicorn -v
       - RailsおよびUnicornは、Serverspecにスクリプトファイルを読み込ませることで解決。環境変数の修正策を出来るだけ多く集めるためChatGPTを使用。検討し得る策を提示させ、その実行結果をインプットに追加して探索範囲を狭めながら検討。  
         ![図](images_lec11/4-2-1_chatgpt_res.PNG)  
         ![図](images_lec11/4-2-2_chatgpt_res.PNG)  
+
+## 備忘録
+
+<details>
+<summary>作業工程</summary>
+
+- Serverspecのインストール
+  ![図](images_lec11/1-1_install_severspec_rake.PNG)  
+  ![図](images_lec11/1-2_serverspec-init.PNG)  
+
+</details>
