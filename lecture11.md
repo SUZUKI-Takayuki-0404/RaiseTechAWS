@@ -20,7 +20,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     
     # MariaDBがインストールされていないこと(＝検索結果に含まれない)
     describe command('yum list installed | grep mariad') do
-      its(:stdout) { should match // }
+      its(:stdout) { should match '' }
     end
     
     # gitがインストールされていること
@@ -30,7 +30,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     
     # Ruby のバージョンは3.1.2であること
     describe command('ruby -v') do
-      its(:stdout) { should match /ruby 3.1.2/ }
+      its(:stdout) { should match 'ruby 3.1.2' }
     end
     
     # bundlerのバージョンは2.3.14であること
@@ -40,22 +40,22 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     
     #railsのバージョンは7.0.4であること
     describe command('bash /home/ec2-user/check_rails_version.sh') do
-      its(:stdout) { should match /Rails 7.0.4/ }
+      its(:stdout) { should match 'Rails 7.0.4' }
     end
     
     # nodeのバージョンは17.9.1であること
     describe command('node -v') do
-      its(:stdout) { should match /v17.9.1/ }
+      its(:stdout) { should match 'v17.9.1' }
     end
     
     ## yarnのバージョンは1.22.19であること
     describe command('yarn -v') do
-      its(:stdout) { should match /1.22.19/ }
+      its(:stdout) { should match '1.22.19' }
     end
     
     # unicornのバージョンは6.1.0であること
     describe command('bash /home/ec2-user/check_unicorn_version.sh') do
-      its(:stdout) { should match /unicorn v6.1.0/ }
+      its(:stdout) { should match 'unicorn v6.1.0' }
     end
      
     # Nginxがインストール済であること
