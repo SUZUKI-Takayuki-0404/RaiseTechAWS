@@ -85,6 +85,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
 
 ```
 
+※以下、修正に向けて調査中
 エラー対処のためスクリプトファイルとして実行\(Rails, Unicorn のバージョン確認\)
 ```cat check_rails_version.sh
 # !/bin/bash
@@ -121,7 +122,7 @@ unicorn -v
       - Serverspecの環境変数が関係すると考え、Bundlerについてwhichコマンドで確認すると、パスが不一致。  
         ![図](images_lec11/3-4_test_failed_which_bundle.PNG)  
       - Rails、Unicornのバージョン確認時、コマンドライン手入力では正しく出力されているが、Serverspecでは出力されない。
-      - ![図](images_lec11/3-16-3_unicorn_test_trial_result2.PNG)  
+        ![図](images_lec11/3-16-3_unicorn_test_trial_result2.PNG)  
     - 処置：  
       - whichコマンドの問題は、期待値（出力結果）のパスに使っていたチルダ（ホームディレクトリ）をフルパス表記に置換することで解決。（＝テストコード不備でありバージョンの問題とは無関係）  
         ![図](images_lec11/3-4-2_bundler_path.PNG)  
