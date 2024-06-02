@@ -85,7 +85,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
 
 ```
 
-※以下、修正に向けて調査中
+※以下、修正に向けて調査中  
 エラー対処のためスクリプトファイルとして実行\(Rails, Unicorn のバージョン確認\)
 ```cat check_rails_version.sh
 # !/bin/bash
