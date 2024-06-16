@@ -235,6 +235,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     インストール成功したにもかかわらず、エラー表示が出た場合は、EC2再起動で治る場合あり
     ![図](images_lec11/5-7-1_install_-v_err.PNG)  
     ![図](images_lec11/5-7-2_Reboot_ec2_recover_rails.PNG)  
+
 - yarn
   - yarnをバージョン指定でインストール
     ```
@@ -287,41 +288,41 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ![図](images_lec11/5-8-13_Listing_fruits_bindev_ok.PNG)  
     アプリは起動しデータ登録可能だが、画像が正しく表示されない  
     ![図](images_lec11/5-9-1_Listing_fruits_bindev_pict_err.PNG)  
-- ImageMagic  
-  ![図]()  
+
+- ImageMagic   
   - epelのインストール
-  ```
-  sudo amazon-linux-extras install epel
-  ```
-  ![図](images_lec11/5-9-3_amazon-linux-extras_install.PNG)  
-  ![図](images_lec11/5-9-4_amazon-linux-extras_install_epel.PNG)  
+    ```
+    sudo amazon-linux-extras install epel
+    ```
+    ![図](images_lec11/5-9-3_amazon-linux-extras_install.PNG)  
+    ![図](images_lec11/5-9-4_amazon-linux-extras_install_epel.PNG)  
   - Remi Repositoryのインストール
-  ```
-  sudo yum install epel-release
-  ```
-  ```
-  sudo rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm`
-  ```
-  ![図](images_lec11/5-9-5_install_epel-release_remi.PNG)
+    ```
+    sudo yum install epel-release
+    ```
+    ```
+    sudo rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm`
+    ```
+    ![図](images_lec11/5-9-5_install_epel-release_remi.PNG)
   - ImageMagickに必要なその他パッケージのインストール
-  ```
-  sudo yum install fftw3
-  ```
-  ![図](images_lec11/5-9-6_install_fftw3.PNG)  
-  ```
-  sudo yum install libraqm
-  ```
-  ![図](images_lec11/5-9-7_install_libraqm.PNG)  
-  ```
-  sudo yum install --enablerepo=remi ImageMagick7 ImageMagick7-devel
-  ```
-  ![図](images_lec11/5-9-8_installImageMagick7_-devel.PNG)  
+    ```
+    sudo yum install fftw3
+    ```
+    ![図](images_lec11/5-9-6_install_fftw3.PNG)  
+    ```
+    sudo yum install libraqm
+    ```
+    ![図](images_lec11/5-9-7_install_libraqm.PNG)  
+    ```
+    sudo yum install --enablerepo=remi ImageMagick7 ImageMagick7-devel
+    ```
+    ![図](images_lec11/5-9-8_installImageMagick7_-devel.PNG)  
   - 以下パッケージも追加
-  ```
-  sudo yum install vips vips-devel vips-tools
-  ```
-  ![図](images_lec11/5-9-9_Could_not_open_library_vips_so_42_vips_so_42.PNG)  
-  ![図](images_lec11/5-9-10_install_vips_vips-devel_vips-tools.PNG)  
+    ```
+    sudo yum install vips vips-devel vips-tools
+    ```
+    ![図](images_lec11/5-9-9_Could_not_open_library_vips_so_42_vips_so_42.PNG)  
+    ![図](images_lec11/5-9-10_install_vips_vips-devel_vips-tools.PNG)  
   
 - systemd
   - 定義ファイル`samples/puma.service`を`/etc/systemd/system`にコピー
@@ -337,6 +338,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ![図](images_lec11/5-11-2_start_puma_service.PNG)  
   - パブリックIPでアクセスしbin/devコマンド無しでアクセスを確認
     ![図](images_lec11/5-11-3_Furuits_Listed_Systemd.PNG)  
+
 - Nginx
   - インストール
     ```
@@ -379,11 +381,11 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ![図](images_lec11/5-12-13_bin_rails_assets_precompile.PNG)  
   - 再度確認すると問題なく表示
     ![図](images_lec11/5-12-14_Furuits_Listed_port80.PNG)  
+
 - Serverspec
   - インストール
     ![図](images_lec11/1-1_install_severspec_rake.PNG)  
     ![図](images_lec11/1-2_serverspec-init.PNG)  
-
 
 - 操作用\/情報確認用コマンド
   - Maria DB（有無確認）  
