@@ -323,6 +323,8 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ```
     ![図](images_lec11/5-9-9_Could_not_open_library_vips_so_42_vips_so_42.PNG)  
     ![図](images_lec11/5-9-10_install_vips_vips-devel_vips-tools.PNG)  
+    正しく表示されることを確認
+    ![図](images_lec11/5-9-11_Fuite_Listed.PNG)  
   
 - systemd
   - 定義ファイル`samples/puma.service`を`/etc/systemd/system`にコピー
