@@ -12,7 +12,8 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
   - ソフトウェアバージョンが意図したものであること
   - 通信が成功すること
 
-  >[!NOTE]サンプルアプリ更新に伴いテスト項目見直し（Unicorn除外、Systemd追加
+  > [!NOTE]  
+  > サンプルアプリ更新に伴いテスト項目見直し（Unicorn除外、Systemd追加
   ```
   require 'spec_helper'
   
