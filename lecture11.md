@@ -8,7 +8,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
 ### テストコード
 
 > [!NOTE]  
-> サンプルアプリ更新に伴いテスト項目見直し（Unicorn除外、Systemd追加
+> サンプルアプリ更新に伴いテスト項目見直し（Unicorn除外、Systemd追加）
 
 - [課題5](https://github.com/SUZUKI-Takayuki-0404/RaiseTechAWS/blob/main/lecture05.md)の環境構築時に、インストール後に手作業で実施したソフトウェアのインストールおよびバージョン確認  
   - ソフトウェアがインストール済みであること
