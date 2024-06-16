@@ -31,7 +31,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     it { should be_installed }
   end
   
-  # ruby のバージョンは3.1.2であること
+  # ruby のバージョンは3.2.3であること
   describe command('ruby -v') do
     its(:stdout) { should match 'ruby 3.2.3' }
   end
@@ -41,7 +41,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     it { should be_installed.by('gem').with_version('2.3.14') }
   end
   
-  # railsのバージョンは7.0.4であること
+  # railsのバージョンは7.1.3.2であること
   describe package('rails') do
     it { should be_installed.by('gem').with_version('7.1.3.2') }
   end
