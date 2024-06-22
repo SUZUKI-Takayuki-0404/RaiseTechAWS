@@ -25,7 +25,7 @@ Resources:
   Lecture10EC2:
     Type: AWS::EC2::Instance
     Properties:
-      AvailabilityZone: #ap-northeast-1a
+      AvailabilityZone:
         Fn::ImportValue:
           !Sub ${EnvironmentName}-availability-zone1
       IamInstanceProfile: !Ref Lecture10InstanceProfile

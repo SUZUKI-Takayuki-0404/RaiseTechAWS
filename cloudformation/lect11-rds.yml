@@ -20,7 +20,7 @@ Parameters:
   MasterUserPasswordRDSInstance:
     Description: 1) ASCII character except "/", """, or "@". 2) Must contain from 8 to 41 characters
     Type: String
-    Default: password
+    #Default: password
     NoEcho: true  #To hide a password from a console, command line tools and APIs
 
 #-----------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ Resources:
     Properties:
       AllocatedStorage: 20
       AutoMinorVersionUpgrade: false
-      AvailabilityZone: #ap-northeast-1a
+      AvailabilityZone:
         Fn::ImportValue:
           !Sub ${EnvironmentName}-availability-zone1
       BackupRetentionPeriod: 0
