@@ -193,7 +193,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIP: 0.0.0.0/0 #!Ref MyIPAddress
+          #CidrIP: 0.0.0.0/0 #!Ref MyIPAddress
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-alb-sg
