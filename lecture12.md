@@ -22,7 +22,10 @@
   ```
 - config.ymlを本課題の[サンプルコンフィグ](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/circleci)に書き換える。
   ![図](images_lec12/0-1_circleci_project_setup.PNG)  
-- リモートリポジトリにpushすると、`Template file not found: cloudformation/*.yml`とエラー指摘
-- 指定のディレクトリとテンプレートファイルとを用意
+- pushすると、`Template file not found: cloudformation/*.yml`とエラー指摘
+  ![図]()  
+- 指定のディレクトリとテンプレートファイルとを用意しpushすると、ymlファイル内のエラー指摘
+  ![図]()
+- 
 
 </details>

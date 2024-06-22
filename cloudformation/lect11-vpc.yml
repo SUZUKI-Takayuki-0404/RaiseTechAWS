@@ -180,7 +180,7 @@ Resources:
           ToPort: 3306
           SourceSecurityGroupId: !Ref Lecture10SecurityGroupEC2
       Tags:
-        - key: Name
+        - Key: Name
           Value: !Sub ${EnvironmentName}-rds-sg
       VpcId: !Ref Lecture10VPC
 
