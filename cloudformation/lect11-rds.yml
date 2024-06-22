@@ -10,7 +10,7 @@ Parameters:
   EnvironmentName:
     Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
     Type: String
-    Default: lecture10
+    Default: lecture11
 
   MasterUsernameRDSInstance:
     Description: 1) Must be 1 to 16 letters or numbers. 2) First character must be a letter. 3) Can't be a reserved word for the chosen database engine.
@@ -47,7 +47,9 @@ Resources:
     Properties:
       AllocatedStorage: 20
       AutoMinorVersionUpgrade: false
-      AvailabilityZone: ap-northeast-1a
+      AvailabilityZone: #ap-northeast-1a
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-availability-zone1
       BackupRetentionPeriod: 0
       CopyTagsToSnapshot: false
       DBInstanceClass: db.t3.micro

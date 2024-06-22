@@ -10,7 +10,7 @@ Parameters:
   EnvironmentName:
     Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
     Type: String
-    Default: lecture10
+    Default: lecture11
 
   KeyNameEC2:
     Description: Key Pair associated when launching EC2
@@ -25,7 +25,9 @@ Resources:
   Lecture10EC2:
     Type: AWS::EC2::Instance
     Properties:
-      AvailabilityZone: ap-northeast-1a
+      AvailabilityZone: #ap-northeast-1a
+        Fn::ImportValue:
+          !Sub ${EnvironmentName}-availability-zone1
       IamInstanceProfile: !Ref Lecture10InstanceProfile
       ImageId: ami-05b37ce701f85f26a
       InstanceInitiatedShutdownBehavior: stop #(stop | terminate)

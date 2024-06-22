@@ -10,7 +10,7 @@ Parameters:
   EnvironmentName:
     Description: Added to a Value of a Name(Key) in Resource's Tag. EnvironmentName must be the same in templates for Cross Stack
     Type: String
-    Default: lecture10
+    Default: lecture11
 
   MyIPAddress:
     Description: CIDR for "My IP Address"
