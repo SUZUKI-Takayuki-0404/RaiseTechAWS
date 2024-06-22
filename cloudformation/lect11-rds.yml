@@ -61,7 +61,7 @@ Resources:
       LicenseModel: general-public-license
       MasterUsername: !Ref MasterUsernameRDSInstance
       #MasterUserPassword: !Ref MasterUserPasswordRDSInstance
-      MasterUserPassword: '{{resolve:ssm:/user/password}}'
+      MasterUserPassword: '{{resolve:ssm-secure:/user/password}}'
       MultiAZ: false
       Tags:
         - Key: Name
