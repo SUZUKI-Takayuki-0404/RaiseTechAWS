@@ -62,8 +62,8 @@ Resources:
       LicenseModel: general-public-license
       MasterUsername: !Ref MasterUsernameRDSInstance
       #MasterUserPassword: !Ref MasterUserPasswordRDSInstance
-      #MasterUserPassword: '{{resolve:ssm:/dev/hoge/dynamodb/user/table-name}}'   #!Ref MasterUserPasswordRDSInstance
-      MasterUserPassword: '{{resolve:secretsmanager:SecretName:SecretStringKey}}'
+      MasterUserPassword: '{{resolve:ssm-secure:/dev/hoge/dynamodb/user/table-name}}'   #!Ref MasterUserPasswordRDSInstance
+      #MasterUserPassword: '{{resolve:secretsmanager:SecretName:SecretStringKey}}'
       MultiAZ: false
       Tags:
         - Key: Name
