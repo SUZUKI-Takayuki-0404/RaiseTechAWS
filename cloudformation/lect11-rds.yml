@@ -20,7 +20,7 @@ Parameters:
   MasterUserPasswordRDSInstance:
     Description: 1) ASCII character except "/", """, or "@". 2) Must contain from 8 to 41 characters
     Type: String
-    #Default: password
+    Default: {{resolve:ssm:/dev/hoge/dynamodb/user/table-name}} #動的参照 #password
     NoEcho: true  #To hide a password from a console, command line tools and APIs
 
 #-----------------------------------------------------------------------------------------------
