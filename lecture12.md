@@ -1,7 +1,8 @@
 # AWSフルコース講座 第12回課題
 
 ## 実施内容
-- 今回の手戻り
+- サンプルコンフィグが正しく動作するようにしてRepositoryに組み込んだ状態
+- 
 ## 所感
 
 ## 備忘録
@@ -19,7 +20,9 @@
   ```
   git checkout lecture12
   ```
-- config.ymlを提供されている内容に書き換える。
+- config.ymlを本課題の[サンプルコンフィグ](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/circleci)に書き換える。
   ![図](images_lec12/0-1_circleci_project_setup.PNG)  
+- リモートリポジトリにpushすると、`Template file not found: cloudformation/*.yml`とエラー指摘
+- 指定のディレクトリとテンプレートファイルとを用意
 
 </details>
