@@ -1,6 +1,9 @@
 # AWSフルコース講座 第12回課題
 
 ## 実施内容
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/SUZUKI-Takayuki-0404/RaiseTechAWS/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/SUZUKI-Takayuki-0404/RaiseTechAWS/tree/main)
+
 - サンプルコンフィグが正しく動作するようにしてRepositoryに組み込んだ状態
 - 
 ## 所感
