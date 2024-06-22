@@ -60,7 +60,7 @@ Resources:
       EngineVersion: 8.0.35
       LicenseModel: general-public-license
       MasterUsername: !Ref MasterUsernameRDSInstance
-      MasterUserPassword: !Ref MasterUserPasswordRDSInstance
+      MasterUserPassword: '{{resolve:ssm:/dev/hoge/dynamodb/user/table-name}}' #!Ref MasterUserPasswordRDSInstance
       MultiAZ: false
       Tags:
         - Key: Name
