@@ -17,11 +17,11 @@ Parameters:
     Type: String
     Default: admin
 
-  MasterUserPasswordRDSInstance:
-    Description: 1) ASCII character except "/", """, or "@". 2) Must contain from 8 to 41 characters
-    Type: String
-    Default: '{{resolve:ssm-secure:/user/password}}'      #Default: password
-    NoEcho: true  #To hide a password from a console, command line tools and APIs
+  #MasterUserPasswordRDSInstance:
+    #Description: 1) ASCII character except "/", """, or "@". 2) Must contain from 8 to 41 characters
+    #Type: String
+    #Default: '{{resolve:ssm-secure:/user/password}}'   #Default: password
+    #NoEcho: true  #To hide a password from a console, command line tools and APIs
 
 #-----------------------------------------------------------------------------------------------
 Resources:
@@ -60,9 +60,8 @@ Resources:
       EngineVersion: 8.0.35
       LicenseModel: general-public-license
       MasterUsername: !Ref MasterUsernameRDSInstance
-      MasterUserPassword: !Ref MasterUserPasswordRDSInstance
-      #MasterUserPassword: '{{resolve:ssm:/user/password}}'
-      #MasterUserPassword: '{{resolve:ssm-secure:/dev/hoge/dynamodb/user/table-name}}'
+      #MasterUserPassword: !Ref MasterUserPasswordRDSInstance
+      MasterUserPassword: '{{resolve:ssm:/user/password}}'
       MultiAZ: false
       Tags:
         - Key: Name
