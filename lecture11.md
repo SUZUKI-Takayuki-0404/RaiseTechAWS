@@ -57,7 +57,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
   end
   
   #ImageMagick7がインストール済であること
-  describe package('systemd') do
+  describe package('ImageMagick7') do
       it { should be_installed }
   end
   
