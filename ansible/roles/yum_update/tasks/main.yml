@@ -1,0 +1,7 @@
+---
+- name: yum_update
+  become_user: root
+  yum:
+    name: '*'
+    state: latest
+
