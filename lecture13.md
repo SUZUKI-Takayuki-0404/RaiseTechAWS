@@ -35,7 +35,7 @@
     ansible --version
     ```
     ![図](images_lec13/0-5_ansible_--version.PNG)  
-- Ansibleによる環境構築  
+- Ansibleによる環境構築準備  
   - 階層構造  
     ![図](images_lec13/2-1_ansible_folder_tree.PNG)  
   - Playbookの作成 `site.yml`  
@@ -58,6 +58,19 @@
   - Ansible.cfgの作成
     - Inventoryファイルのパスを追加し、`ansible-playbook`コマンド時の追記を省略
       ![図](images_lec13/1-4_ansible_cfg_inventory_path.PNG)  
+    - EC2初回SSH接続時のfingerprintダイアログを発生させないため、`host_key_checking=False`の設定を追加
+      ![図](images_lec13/1-3-1_ansible_inventories_host_key_check_false.PNG)  
+- Playbookの作成(Role別)
+  - MySQL
+    - MySQLのRepositoryをEC2に追加する際、コマンドライン手入力で使っていたURLではエラー出力（コマンドライン入力すると成功する）
+    - EC2に直接追加せず、EC2の一時ファイル保管ディレクトリに一度ダウンロードを試行しても、403エラー出力（ブラウザにURL直接入力するとダウンロードは成功する）
+    - curlコマンドでURLを確認するとリダイレクトされている事が判明（ステータスコード302）
+      ![図](images_lec13/3-1-1_mysql_download-url-err1.PNG)
+      ![図](images_lec13/3-1-1_mysql_download-url-err2.PNG)  
+    - リダイレクト先のURLに変更で成功
+      ![図](images_lec13/3-1-1_mysql_download-url-ok.PNG)  
+    - Mysql-community-serverパッケージは、実際にMySQLのrepositoryをダウンロードできていないと実行できず、ドライランではエラーとなるため、'ignore_errors'設定を追加
+      ![図](images_lec13/3-2_mysql-community-server_ignore_errors.PNG)  
 
 > [!NOTE]  
 > サンプル
