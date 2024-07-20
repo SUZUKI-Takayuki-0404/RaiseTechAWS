@@ -62,15 +62,68 @@
       ![図](images_lec13/1-3-1_ansible_inventories_host_key_check_false.PNG)  
 - Playbookの作成(Role別)
   - MySQL
-    - MySQLのRepositoryをEC2に追加する際、コマンドライン手入力で使っていたURLではエラー出力（コマンドライン入力すると成功する）
-    - EC2に直接追加せず、EC2の一時ファイル保管ディレクトリに一度ダウンロードを試行しても、403エラー出力（ブラウザにURL直接入力するとダウンロードは成功する）
+    - MySQLのRepositoryをEC2に追加する際、コマンドライン手入力で使っていたURLではエラー出力（コマンドライン入力時は成功）
+    - EC2に直接追加せず、EC2の一時ファイル保管ディレクトリに一度ダウンロードを試行しても、403エラー出力（ブラウザにURL直接入力時は成功）
     - curlコマンドでURLを確認するとリダイレクトされている事が判明（ステータスコード302）
       ![図](images_lec13/3-1-1_mysql_download-url-err1.PNG)
       ![図](images_lec13/3-1-1_mysql_download-url-err2.PNG)  
     - リダイレクト先のURLに変更で成功
       ![図](images_lec13/3-1-1_mysql_download-url-ok.PNG)  
-    - Mysql-community-serverパッケージは、実際にMySQLのrepositoryをダウンロードできていないと実行できず、ドライランではエラーとなるため、'ignore_errors'設定を追加
+    - Mysql-community-serverパッケージは、実際にMySQLのRepositoryをダウンロードしないと実行できず、ドライランではエラーとなるため、`ignore_errors`設定を追加
       ![図](images_lec13/3-2_mysql-community-server_ignore_errors.PNG)  
+  - git  
+    ![図](images_lec13/3-3_yum_git.PNG)  
+  - anyenv
+    - 個別のroleフォルダの内容を一括作成
+      ![図](images_lec13/3-3-0_anyenv_ansible-galaxy_init_roles_anyenv.PNG)  
+    - `shell`モジュールや`command`モジュールは以下設定を追加
+      - 実行するとchangedが返されるので、`when_changed: no`に設定変更
+      - 冪等性の理由から再実行されないよう条件を追加
+        ![図](images_lec13/3-3-1_anyenv_when_changed_no.PNG)  
+      - ansibleの初回実行時は`anyenv -v`コマンドは失敗するが、以降は成功するので、失敗時のみ各処理を実行するようにしている
+        ![図](images_lec13/3-3-1_anyenv_ansible-playbook_failed1.PNG)  
+    - `anyenv install -init`コマンド実行時に`y/N`回答を求められるので、`yes`コマンドで対応
+      ![図](images_lec13/3-3-2_anyenv_install_init_yes_answer.PNG)  
+      ![図](images_lec13/3-3-2_anyenv_install_init_yes.PNG)  
+    - `anyenv install rbenv`コマンドはフルパス指定にしないとコマンドが認識されない
+      ![図](images_lec13/3-3-1_anyenv_fullpath.PNG)  
+    - `rbenv install 3.2.3`コマンドは`install`コマンドが認識されない(PATH変数追加でもNG)ため、環境設定をロードするコマンドと合わせて実行
+      - フルパス記述していない場合は`command not found`のメッセージ
+        ![図](images_lec13/3-3-2_anyenv_rb_nod_install_failled1.PNG)  
+      - フルパス記述しても、`no such command 'install'`のメッセージ
+        ![図](images_lec13/3-3-2_anyenv_rb_nod_install_fullpath.PNG)  
+        ![図](images_lec13/3-3-2_anyenv_rb_nod_install_failled2.PNG)  
+      - `rbenv install`コマンドの前に環境設定を読み込ませるコマンドを追加することで成功
+        ![図](images_lec13/3-3-3_anyenv_rb_nod_install_ok.PNG)  
+  - gem(rails & bundler)
+      - ![図]()  
+        ![図]()  
+        ![図]()  
+  - yarn
+    - aaa
+      ![図]()  
+      ![図]()  
+      ![図]()  
+  - サンプルアプリ
+    - aaa
+      ![図]()  
+      ![図]()  
+      ![図]()  
+  - ImageMagick
+    - aaa
+      ![図]()  
+      ![図]()  
+      ![図]()  
+  - Systemd
+    - aaa
+      ![図]()  
+      ![図]()  
+      ![図]()  
+  - Nginx
+    - aaa
+      ![図]()  
+      ![図]()  
+      ![図]()  
 
 > [!NOTE]  
 > サンプル
