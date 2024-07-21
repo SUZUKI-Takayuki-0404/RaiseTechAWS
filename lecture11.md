@@ -385,10 +385,10 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ![図](images_lec11/5-12-14_Furuits_Listed_port80.PNG)  
 
 - S3への画像保存
-  - 保存先設定をローカルから切替
+  - 保存先設定をローカルから切替  
     ![図](images_lec11/5-13-1_S3-config_storage-ylm.PNG)  
     ![図](images_lec11/5-13-2_S3-development-rb_config-active_strage_service_amazon.PNG)  
-  - 暗号化エラーが出ていたので修正
+  - 暗号化エラーが出ていたので修正  
     ![図](images_lec11/5-13-3_Rails_encryption_err1.PNG)  
     ![図](images_lec11/5-13-4_Rails_encryption_err_solved1.PNG)  
 

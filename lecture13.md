@@ -73,27 +73,27 @@
       ![図](images_lec13/2-2_mysql-community-server_ignore_errors.PNG)  
   - git  
     ![図](images_lec13/3-3_yum_git.PNG)  
-  - anyenv
-    - 個別のroleフォルダの内容を一括作成
+  - anyenv  
+    - 個別のroleフォルダの内容を一括作成  
       ![図](images_lec13/3-3-0_anyenv_ansible-galaxy_init_roles_anyenv.PNG)  
     - `shell`モジュールや`command`モジュールは以下設定を追加
       - 実行するとchangedが返されるので、`changed_when: no`を設定
-      - 冪等性の理由から再実行されないよう条件を追加
+      - 冪等性の理由から再実行されないよう条件を追加  
         ![図](images_lec13/3-3-1_anyenv_when_changed_no.PNG)  
-      - ansibleの初回実行時は`anyenv -v`コマンドは失敗するが、以降は成功するので、失敗時のみ各処理を実行するようにしている
+      - ansibleの初回実行時は`anyenv -v`コマンドは失敗するが、以降は成功するので、失敗時のみ各処理を実行させる  
         ![図](images_lec13/3-3-1_anyenv_ansible-playbook_failed1.PNG)  
-    - `anyenv install -init`コマンド実行時に`y/N`回答ダイアログが出るので、`yes`コマンドで対応
+    - `anyenv install -init`コマンド実行時に`y/N`回答ダイアログが出るので、`yes`コマンドで対応  
       ![図](images_lec13/3-3-2_anyenv_install_init_yes_answer.PNG)  
       ![図](images_lec13/3-3-2_anyenv_install_init_yes.PNG)  
-    - `anyenv install rbenv`コマンドはフルパス指定にしないとコマンドが認識されない
+    - `anyenv install rbenv`コマンドはフルパス指定にしないとコマンドが認識されない  
       ![図](images_lec13/3-3-1_anyenv_fullpath.PNG)  
     - `rbenv install 3.2.3`コマンドは`install`コマンドが認識されない(PATH変数追加でもNG)ため、環境設定をロードするコマンドと合わせて実行
-      - フルパス記述していない場合は`command not found`のメッセージ
+      - フルパス記述していない場合は`command not found`のメッセージ  
         ![図](images_lec13/3-3-2_anyenv_rb_nod_install_failled1.PNG)  
       - フルパス記述しても、`no such command 'install'`のメッセージ
         ![図](images_lec13/3-3-2_anyenv_rb_nod_install_fullpath.PNG)  
         ![図](images_lec13/3-3-2_anyenv_rb_nod_install_failled2.PNG)  
-      - `rbenv install`コマンドの前に環境設定を読み込ませるコマンドを追加することで成功
+      - `rbenv install`コマンドの前に環境設定を読み込ませるコマンドを追加することで成功  
         ![図](images_lec13/3-3-3_anyenv_rb_nod_install_ok.PNG)  
 
   - rails & bundler & yarn
@@ -108,12 +108,14 @@
       ![図](images_lec13/4-3-1_yarn_add_PATH.PNG)  
 
   - ImageMagick
-    - aaa  
-      ![図]()  
-      ![図]()  
-      ![図]()  
+    - epelのインストール時に'y/N'ダイアログが出るので、'yes'コマンドで対応  
+      ![図](images_lec13/5-1-1_ImageMagick_install-epel_yn-diarog.PNG)  
+    - 'epel-release'等のパッケージインストールはrootユーザー必須  
+      ![図](images_lec13/5-1-1_ImageMagick_install-epel-release-and-others_failed_not-root.PNG)  
+    - 'remi-release-7'および'ImageMagick7'のインストール時は`sudo`コマンド必須
+      ![図](images_lec13/5-1-1_ImageMagick_install-remi_failed_sudo-not-found.PNG)  
 
-  - サンプルアプリ
+  - raisetech-live8-sample-app
     - aaa  
       ![図]()  
       ![図]()  
