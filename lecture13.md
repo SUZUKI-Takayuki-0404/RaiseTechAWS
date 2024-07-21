@@ -37,7 +37,7 @@
     ![図](images_lec13/0-5_ansible_--version.PNG)  
 - Ansibleによる環境構築準備  
   - 階層構造  
-    ![図](images_lec13/2-1_ansible_folder_tree.PNG)  
+    ![図](images_lec13/2-0-2_ansible_folder_tree.PNG)  
   - Playbookの作成 `site.yml`  
     ![図](images_lec13/1-1_ansible_site_yml.PNG)  
   - Role
@@ -47,7 +47,7 @@
       ```
       ansible-galaxy init roles/<Rile名>
       ```
-      ![図](images_lec13/2-0_ansible-galaxy_init_roles_mysqlPNG.PNG)  
+      ![図](images_lec13/2-0-1_ansible-galaxy_init_roles_mysqlPNG.PNG)  
   - Inventoryの作成
     - ターゲットノード(EC2)のIPアドレスとユーザー名を定義⇒ドライランでエラー発生
       ![図](images_lec13/1-3_ansible_inventories_host-err1.PNG)  
@@ -65,24 +65,24 @@
     - MySQLのRepositoryをEC2に追加する際、コマンドライン手入力で使っていたURLではエラー出力（コマンドライン入力時は成功）
     - EC2に直接追加せず、EC2の一時ファイル保管ディレクトリに一度ダウンロードを試行しても、403エラー出力（ブラウザにURL直接入力時は成功）
     - curlコマンドでURLを確認するとリダイレクトされている事が判明（ステータスコード302）
-      ![図](images_lec13/3-1-1_mysql_download-url-err1.PNG)
-      ![図](images_lec13/3-1-1_mysql_download-url-err2.PNG)  
+      ![図](images_lec13/2-1-1_mysql_download-url-err1.PNG)
+      ![図](images_lec13/2-1-1_mysql_download-url-err2.PNG)  
     - リダイレクト先のURLに変更で成功
-      ![図](images_lec13/3-1-1_mysql_download-url-ok.PNG)  
+      ![図](images_lec13/2-1-1_mysql_download-url-ok.PNG)  
     - Mysql-community-serverパッケージは、実際にMySQLのRepositoryをダウンロードしないと実行できず、ドライランではエラーとなるため、`ignore_errors`設定を追加
-      ![図](images_lec13/3-2_mysql-community-server_ignore_errors.PNG)  
+      ![図](images_lec13/2-2_mysql-community-server_ignore_errors.PNG)  
   - git  
     ![図](images_lec13/3-3_yum_git.PNG)  
   - anyenv
     - 個別のroleフォルダの内容を一括作成
       ![図](images_lec13/3-3-0_anyenv_ansible-galaxy_init_roles_anyenv.PNG)  
     - `shell`モジュールや`command`モジュールは以下設定を追加
-      - 実行するとchangedが返されるので、`when_changed: no`に設定変更
+      - 実行するとchangedが返されるので、`changed_when: no`を設定
       - 冪等性の理由から再実行されないよう条件を追加
         ![図](images_lec13/3-3-1_anyenv_when_changed_no.PNG)  
       - ansibleの初回実行時は`anyenv -v`コマンドは失敗するが、以降は成功するので、失敗時のみ各処理を実行するようにしている
         ![図](images_lec13/3-3-1_anyenv_ansible-playbook_failed1.PNG)  
-    - `anyenv install -init`コマンド実行時に`y/N`回答を求められるので、`yes`コマンドで対応
+    - `anyenv install -init`コマンド実行時に`y/N`回答ダイアログが出るので、`yes`コマンドで対応
       ![図](images_lec13/3-3-2_anyenv_install_init_yes_answer.PNG)  
       ![図](images_lec13/3-3-2_anyenv_install_init_yes.PNG)  
     - `anyenv install rbenv`コマンドはフルパス指定にしないとコマンドが認識されない
@@ -95,32 +95,32 @@
         ![図](images_lec13/3-3-2_anyenv_rb_nod_install_failled2.PNG)  
       - `rbenv install`コマンドの前に環境設定を読み込ませるコマンドを追加することで成功
         ![図](images_lec13/3-3-3_anyenv_rb_nod_install_ok.PNG)  
-  - gem(rails & bundler)
-      - ![図]()  
-        ![図]()  
-        ![図]()  
-  - yarn
-    - aaa
-      ![図]()  
-      ![図]()  
-      ![図]()  
-  - サンプルアプリ
-    - aaa
-      ![図]()  
-      ![図]()  
-      ![図]()  
+
+  - rails & bundler & yarn
+    - Bundlerはデフォルト状態のバージョンが異なるので`gem update --system`コマンドで指定バージョンに変更  
+      ![図](images_lec13/4-1-1_bundler_-v_default-version.PNG)  
+    - Railsはインストール時にdocumentが無い旨のエラーが出るので、`--no-document`オプションを追加  
+      ![図](images_lec13/4-2-1_rails_install_fail1.PNG)  
+      ![図](images_lec13/4-2-1_rails_install_ok_with_--no-document.PNG)  
+    - Yarnはインストール後、`nodenv rehash`コマンド実行により`yarn`コマンドが使えるようになるので、これをPATH変数に追加。 
+      ![図](images_lec13/4-3-1_yarn_command_fail.PNG)  
+      ![図](images_lec13/4-3-1_yarn_ls_yarn_exists.PNG)  
+      ![図](images_lec13/4-3-1_yarn_add_PATH.PNG)  
+
   - ImageMagick
-    - aaa
+    - aaa  
       ![図]()  
       ![図]()  
       ![図]()  
-  - Systemd
-    - aaa
+
+  - サンプルアプリ
+    - aaa  
       ![図]()  
       ![図]()  
       ![図]()  
+
   - Nginx
-    - aaa
+    - aaa  
       ![図]()  
       ![図]()  
       ![図]()  
