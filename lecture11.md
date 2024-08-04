@@ -275,7 +275,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ```
     ![図](images_lec11/5-8-3_bin_setup_start.PNG)  
     > [!NOTE]
-    不足分のパッケージ(sassc2.4.0)のインストールが終わらなくなってしまうブルが発生。  
+    不足分のパッケージ(sassc2.4.0)のインストールが終わらなくなってしまうトラブルが発生。  
     追加インストールするパッケージの一つを個別にインストールした後、bin/devコマンドを実行したところ成功
     ![図](images_lec11/5-8-4_freeze_bundle_install_sassc.PNG)  
     ![図](images_lec11/5-8-5_gem_install_sass-rails.PNG)  
