@@ -161,17 +161,17 @@
     - 上記だけだとSystemd起動エラー発生  
       ![図](images_lec13/7-2-1_systemd_start-failed1.PNG)  
       ![図](images_lec13/7-2-2_systemd_start-failed2.PNG)  
-      ![図](images_lec13/X-9_systemd-start-failed_journalctrl_-xe.PNG)
+      ![図](images_lec13/7-2-3_systemd-start-failed_journalctrl_-xe.PNG)
       - ChatGPTによる検討もしたが結局手詰まり  
         ![図](images_lec13/7-3-1_systemd_start_chatGPT1.PNG)  
         ![図](images_lec13/7-3-2_systemd_start_chatGPT2.PNG)  
-        ![図](images_lec13/X-9_systemd-start-failed_journalctrl_-xe_puma.PNG)
+        ![図](images_lec13/7-3-3_systemd-start-failed_journalctrl_-xe_puma.PNG)
       - `bin/dev`コマンドを一度実行するとエラー発生しなくなることが判明  
         ![図](images_lec13/7-4-1_systemd-start_after-bindev.PNG)  
         ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)
       - `bin/dev`コマンド内で呼び出しているgemパッケージをインストールしても変化なし  
         ![図](images_lec13/7-4-3_systemd_inside-bindev.PNG)
-      - 試行錯誤の結果、`bin/dev`コマンドを一度実行するとエラーは解消するが、正常処理の範囲内では実行を止められないので、タイムアウトさせて終了させるるが、サンプルアプリケーションが起動したままになってしまうので、インスタンスを再起動  
+      - 試行錯誤の結果、`bin/dev`コマンドを一度実行するとエラーは解消するが、正常処理の範囲内では実行を止められないので、タイムアウトさせて終了させるが、サンプルアプリケーションが起動したままになってしまうので、インスタンスを再起動  
         ![図](images_lec13/7-4-4_systemd_bindev-with-timeout.PNG)  
         ![図](images_lec13/7-4-5_systemd_reboot-instance.PNG)
 
@@ -197,24 +197,118 @@
       - 変換対象の文字列から`['を除外すると成功  
         ![図](images_lec13/9-2-3_storage_replace_failed2.PNG)  
         ![図](images_lec13/9-2-4_storage_replace_ok.PNG)  
-  
+
   - 全体テスト  
-    - `yum`の最新化で当初は出なかったエラーが発生    
-      ![図](images_lec13/X10-1-1_overall_test_yum_error.PNG)  
-      - chatGPTにソースコードとエラーコードを分析させて対策追加    
+    - `yum`の最新化で当初は出なかったエラーが発生  
+      ![図](images_lec13/10-1-1_overall_test_yum_error.PNG)  
+      - chatGPTにソースコードとエラーコードを分析させて対策追加  
         ![図](images_lec13/10-1-2_overall_test_yum_error_countermeasure.PNG)  
         ![図](images_lec13/10-1-3_overall_test_yum_error_countermeasure2.PNG)  
 
+- CircleCIへのCloudformation実装
+  - CircleCI
+    - CircleCIの適用先となるGitHubリポジトリを新規作成  
+      ![図](images_lec13/11-1-1_create_new_repo.PNG)  
+    - ローカルにクローンし、`.gitignore`作成およびテンプレートファイル保管してmainブランチにpush  
+      ![図](images_lec13/11-1-2_create_new_repo.PNG)  
+      ![図](images_lec13/11-1-3_create_files.PNG)  
+      ![図](images_lec13/11-1-4_merge_1st_branch.PNG)  
+      ![図](images_lec13/11-1-5_create_files2.PNG)  
+    - CircleCI上で新規ブランチに`say-hello-workflow`を作成し、リネーム後にローカルへ`git fetch`  
+      ![図](images_lec13/11-2-1_select_new_project.PNG)  
+      ![図](images_lec13/11-2-2_starter_pipeline_new_branch.PNG)  
+      ![図](images_lec13/11-2-3_starter_pipeline_new_branch2.PNG)  
+      ![図](images_lec13/11-2-4_rename_branch.PNG)  
+      ![図](images_lec13/11-2-5_rename_branch2.PNG)  
+  - Cloudformation  
+    - CloudformationおよびAWS CLIのorbsを`config.yml`に追加  
+      ![図](images_lec13/11-3-1_orbs_add_aws-cloudformation_aws-cli.PNG)  
+    - 権限不足でエラーが出るので専用のIAMユーザーを作成し権限を追加＆CircleCIの環境変数にアクセスキーとリージョン情報を登録  
+      ![図](images_lec13/11-3-2_cfn_vpc_failed.PNG)  
+      ![図](images_lec13/11-3-3_cfn_IAM_CircleCI2.PNG)  
+      ![図](images_lec13/11-3-4_cfn_IAM_CircleCI4.PNG)  
+      ![図](images_lec13/11-3-5_cfn_vpc_failed3_cfn_access-denied-IAM.PNG)  
+      ![図](images_lec13/11-3-6_cfn_IAM_REGION.PNG)  
+      ![図](images_lec13/11-3-7_cfn_IAM_key.PNG)  
+      ![図](images_lec13/11-3-8_cfn_IAM_key_PASS.PNG)★  
+      ![図](images_lec13/11-3-9_cfn_IAM_key_ID.PNG)★  
+      ![図](images_lec13/11-3-10_cfn_ENV-VALs.PNG)  
+    - CircleCI未承認のorbsを使うには設定変更が必要  
+      ![図](images_lec13/11-3-11_cfn_vpc_failed2_uncertified_orbs.PNG)  
+      ![図](images_lec13/11-3-12_cfn_vpc_failed2_uncertified_orbs2.PNG)  
+      ![図](images_lec13/11-3-13_cfn_vpc_failed2_uncertified_orbs3.PNG)  
+    - CloudFormationのへのアクセス権限も必要  
+      ![図](images_lec13/11-3-14_cfn_vpc_failed3_cfn_access-denied.PNG)  
+      ![図](images_lec13/11-3-15_cfn_vpc_failed3_cfn_access-added.PNG)  
+      ![図](images_lec13/11-3-16_cfn_vpc_ok_cfn_access-added.PNG)  
+    - IAMの設定変更\(今回はロールの作成\)を行っているテンプレートファイルには追加の設定項目`CAPABILITY_NAMED_IAM`が必要  
+      ![図](images_lec13/11-3-17_cfn_error_CAPABILITY_NAMED_IAM.PNG)  
+      ![図](images_lec13/11-3-18_cfn_error_CAPABILITY_NAMED_IAM2.PNG)  
+    - 参考：CircleCIのエラーメッセージの詳細説明機能もエラー確認に有益  
+      ![図](images_lec13/11-3-19_cfn_error_intelligent_summarize_failure_on.PNG)  
+    - Systems Managerにテンプレートファイルへのハードコーディングを避けたい情報を登録  
+      - EC2向けセキュリティグループのマイIPアドレス  
+      - SNS向けメールアドレス
+      - RDS向けパスワード(SecureString対応)
+      - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
+      ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
+    - [第12回課題](lecture12.md)で使用したcfn-lintによるセキュリティチェックもパスしていることを確認  
+      ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
+    - IAMの権限設定\(最終的な状態\)  
+      ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
+
+- AWS CLIによるCloudFormationで構築したリソースからAnsibleへの各種変数の引継ぎ  
+  - AWS CLI
+    - ローカルからAWS各リソースにアクセスできるようアクセス権を設定  
+      ```
+      aws configure
+      ```
+      ![図](images_lec13/11-4-1_CLI_setup.PNG)  
+   
+  - 変数取得
+    - ローカルからCLIを使ってCloudformationで構築したリソースから以下情報を取得するのに必要なコマンドを検討
+      - EC2 Public IP Address
+      - RDS Master User Name
+      - RDS Master Usr Password
+      - RDS Endpoint
+      - ALB DNS Name
+      - S3 Bucket Name
+  - Cloudformation
+    - スタック情報にEC2のPublic IPは表示されない  
+      ![図](images_lec13/11-4-2_cli_cloudformation_describe-stacks_not_conntain_PublicIP.PNG)  
+    - スタック情報にRDSのEndpoint・Userは表示されない\(PassはSystems Managerから取得する\)  
+      ![図](images_lec13/11-4-3_cli_cloudformation_describe-stacks_not_conntain_DBEndP.PNG)  
+    - スタック情報にALBのDNS Nameは表示されない  
+      ![図](images_lec13/11-4-4_cli_cloudformation_describe-stacks_not_conntain_ALBDNSName.PNG)  
+    - スタック情報にS3のBucketNameは表示あり  
+      ![図](images_lec13/11-4-5_cli_cloudforomation_describe-stacks_s3_query_name.PNG)  
+  - EC2
+    - Public IPを取得  
+      ![図](images_lec13/11-4-6_cli_ec2_describe-instances_filter_name_query_PublicIP.PNG)  
+  - RDS
+    - Endpoint・Userを取得  
+      ![図](images_lec13/11-4-7_cli_rds_describe-instance_query_address.PNG)
+      ![図](images_lec13/11-4-8_cli_rds_describe-instance_query_user.PNG)  
+  - ALB
+    - DNS Nameを取得  
+      ![図](images_lec13/11-4-9_cli_enbv2_describe-lbs_query_LBName.PNG)  
+  - Systems Manager
+    - Passを取得  
+      ![図](images_lec13/11-4-10_cli_ssm_get-parameter_pass.PNG)★  
+  - 各変数をシェルスクリプトへ出力
+    ```
+    echo expourt 変数名=$(変数取得コマンド) >> シェルスクリプトファイル名
+    ```
+
 - CircleCIへのAnsible実装
+  - a
+    ![図]()  
+    ![図]()
 
-
-- Severspec
-
-      ![図]()  
-      ![図]()  
-      ![図]()  
-      ![図]()  
-      ![図]()  
+- CircleCIへのSeverspec実装
+  - a
+    ![図]()  
+    ![図]()  
 
 
 > [!NOTE]  
