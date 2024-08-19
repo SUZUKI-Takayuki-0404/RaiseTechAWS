@@ -230,8 +230,8 @@
       ![図](images_lec13/11-3-5_cfn_vpc_failed3_cfn_access-denied-IAM.PNG)  
       ![図](images_lec13/11-3-6_cfn_IAM_REGION.PNG)  
       ![図](images_lec13/11-3-7_cfn_IAM_key.PNG)  
-      ![図](images_lec13/11-3-8_cfn_IAM_key_PASS.PNG)★  
-      ![図](images_lec13/11-3-9_cfn_IAM_key_ID.PNG)★  
+      ![図](images_lec13/11-3-8_cfn_IAM_key_PASS.PNG)  
+      ![図](images_lec13/11-3-9_cfn_IAM_key_ID.PNG)  
       ![図](images_lec13/11-3-10_cfn_ENV-VALs.PNG)  
     - CircleCI未承認のorbsを使うには設定変更が必要  
       ![図](images_lec13/11-3-11_cfn_vpc_failed2_uncertified_orbs.PNG)  
@@ -294,19 +294,29 @@
       ![図](images_lec13/11-4-9_cli_enbv2_describe-lbs_query_LBName.PNG)  
   - Systems Manager
     - Passを取得  
-      ![図](images_lec13/11-4-10_cli_ssm_get-parameter_pass.PNG)★  
+      ![図](images_lec13/11-4-10_cli_ssm_get-parameter_pass.PNG)  
   - 各変数をシェルスクリプトへ出力
     ```
     echo expourt 変数名=$(変数取得コマンド) >> シェルスクリプトファイル名
     ```
 
 - CircleCIへのAnsible実装
-  - a
+  - ansibleのorbs追加
     ![図]()  
-    ![図]()
+    ![図]()  
+  - ローカルで作成し動作確認済みのansible各種ファイルをコピー  
+    ![図]()  
+    ![図]()  
+  - Cloudformationからの変数引継ぎ  
+    ![図]()  
+    ![図]()  
+  - Fingerprintの登録  
+    ![図]()  
+    ![図]()  
+  - 動作確認  
 
 - CircleCIへのSeverspec実装
-  - a
+  - Serverspecのorbs追加
     ![図]()  
     ![図]()  
 
