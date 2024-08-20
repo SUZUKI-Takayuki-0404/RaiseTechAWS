@@ -250,8 +250,8 @@
       - EC2向けセキュリティグループのマイIPアドレス  
       - SNS向けメールアドレス
       - RDS向けパスワード(SecureString対応)
-      - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
-      ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
+        - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
+        ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
     - [第12回課題](lecture12.md)で使用したcfn-lintによるセキュリティチェックもパスしていることを確認  
       ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
     - IAMの権限設定\(最終的な状態\)  
@@ -263,8 +263,7 @@
       ```
       aws configure
       ```
-      ![図](images_lec13/11-4-1_CLI_setup.PNG)  
-   
+      ![図](images_lec13/11-4-1_CLI_setup.PNG)
   - 変数取得
     - ローカルからCLIを使ってCloudformationで構築したリソースから以下情報を取得するのに必要なコマンドを検討
       - EC2 Public IP Address
@@ -301,22 +300,51 @@
     ```
 
 - CircleCIへのAnsible実装
-  - ansibleのorbs追加
-    ![図]()  
-    ![図]()  
-  - ローカルで作成し動作確認済みのansible各種ファイルをコピー  
-    ![図]()  
-    ![図]()  
-  - Cloudformationからの変数引継ぎ  
-    ![図]()  
-    ![図]()  
+  - Ansible
+    - orbs追加  
+      ![図](images_lec13/11-5-1_ans_orbs.PNG)  
+    - ローカルで作成し動作確認済みのansible各種ファイルをコピー  
+      ![図](images_lec13/11-5-2_ans_cp_ansible_directory.PNG)  
+  - 変数引継ぎ
+    - ジョブ内の別ステップ間で、`persist_to_workspace`で保存した変数を`attach_workspace`で引継ぎ  
+      ![図](images_lec13/11-5-3_ans_perrsist-to_attach_on_ci.PNG)  
+    - `env_vars.sh`に保管した変数を`ansible/inventories/host.yml`および`ansible/site.yml`に置換コマンドで反映  
+      ![図](images_lec13/11-5-4_sns_env-vars_input-ok.PNG)  
   - Fingerprintの登録  
-    ![図]()  
-    ![図]()  
+    ![図](images_lec13/11-5-6_ans_ssh_key_created.PNG)  
+    ![図](images_lec13/11-5-7_ans_ssh_key_fingerprin_created.PNG)  
+    - フィンガープリントを直接貼らずに環境変数にしてみたが、CircleCIのansibleフィンガープリントを読み取らないため直接入力に変更  
+      ![図](images_lec13/11-5-8_ans_fingerprint_env_failed.PNG)  
+      ![図](images_lec13/11-5-9_ans_fingerprint_env_failed2.PNG)  
+  - インベントリーファイルの読み込みエラー
+    - インベントリーファイルの指示なし  
+      ![図](images_lec13/11-5-10_ans_inventory_failed_without_playbook-options.PNG)  
+    - オプション設定を`inventory-parameters`で指定したがインベントリーファイルを読み取れないエラー  
+      ![図](images_lec13/11-5-11_ans_inventory_failed_with_inventory-parameters.PNG)  
+    - `playbook-options`でIPアドレスを引数にしたところ、結果PASSだがインベントリーファイル読み取れず  
+      ![図](images_lec13/11-5-11_ans_inventory_failed_with_playbook-options.PNG)  
+  - インスタンス接続エラー  
+    - `playbook-options`でインベントリーファイルを引数にしたところ接続エラー  
+      ![図](images_lec13/11-5-12_failed5_connection-sg.PNG)  
+    - SSH接続についてセキュリティグループのインバウンドグループ設定を見直し  
+      ![図](images_lec13/11-5-13_inventory_input-failed6_MyIP-delete.PNG)  
+  - インスタンス接続のタイムアウトエラー
+    - 確認メッセージが出てしまいタイムアウト  
+      ![図](images_lec13/11-5-14_inventory_input-failed7_timeout.PNG)  
+    - `ansible.cfg`が読み込まれていない  
+      ![図](images_lec13/11-5-15_inventory_input-failed7_timeout_add_cfg2.PNG)  
+    - `ansible.cfg`をルートディレクトリに動かしたところ読み取られた  
+      ![図](images_lec13/11-6-16_ansible_timeout_cfg-in-ansible-folder.PNG)  
+      ![図](images_lec13/11-6-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
+      ![図](images_lec13/11-6-18_inventory_ok.PNG)  
   - 動作確認  
+    ![図]()  
+    ![図]()  
+    ![図]()  
+    ![図]()  
 
 - CircleCIへのSeverspec実装
-  - Serverspecのorbs追加
+  - Serverspecのorbs追加  
     ![図]()  
     ![図]()  
 
