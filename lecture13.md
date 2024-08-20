@@ -333,20 +333,50 @@
       ![図](images_lec13/11-5-14_inventory_input-failed7_timeout.PNG)  
     - `ansible.cfg`が読み込まれていない  
       ![図](images_lec13/11-5-15_inventory_input-failed7_timeout_add_cfg2.PNG)  
-    - `ansible.cfg`をルートディレクトリに動かしたところ読み取られた  
-      ![図](images_lec13/11-6-16_ansible_timeout_cfg-in-ansible-folder.PNG)  
-      ![図](images_lec13/11-6-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
-      ![図](images_lec13/11-6-18_inventory_ok.PNG)  
-  - 動作確認  
-    ![図]()  
-    ![図]()  
-    ![図]()  
-    ![図]()  
+    - `ansible.cfg`をルートディレクトリに動かしたところ読み取られるようになった  
+      ![図](images_lec13/11-5-16_ansible_timeout_cfg-in-ansible-folder.PNG)  
+      ![図](images_lec13/11-5-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
+      ![図](images_lec13/11-5-18_inventory_ok.PNG)  
+  - Ansible実行時エラー（ローカル実行時は発生しなかった）  
+    - 意図しない整数値コマンドでエラー⇒`timeout`の設定が怪しい  
+      ![図](images_lec13/11-5-19_ans_install_failed_anyenv_unexpected_int.PNG)  
+      ![図](images_lec13/11-5-20_ans_install_failed_anyenv_unexpected_int.PNG)  
+    - `timeout`設定をコロンで囲むと、'ansible.builtin.shell'モジュールとコンフリクトしていると指摘  
+      ![図](images_lec13/11-5-21_ans_install_failed_anyenv_conflict.PNG)  
+    - `timeout`設定をコマンド内に変更  
+      ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
+  - Ansible内の変数代入エラー
+    - `ansible/site.yml`で定義した変数が代入できていない  
+      ![図](images_lec13/11-5-22_ans_valiable_import_failed.PNG)  
+      ![図](images_lec13/11-5-29_ans_valiables_import_failed2.PNG)  
+    - `ansible/site.yml`にCloudformationから変数引継ぎ後を再確認⇒Ansible内の変数の一部を誤って置換していた  
+      ![図](images_lec13/11-5-24_ans_valiable_import_failed_unexpected_replacement.PNG)  
+    - Cloudformationからの引継ぐ変数の名称を変更  
+      ![図](images_lec13/11-5-25_ans_valiable_replace_variables_update.PNG)  
+      ![図](images_lec13/11-5-26_ans_valiable_import_update_vars.PNG)  
+    - Ansible実行完了  
+      ![図](images_lec13/11-5-27_ansexecuting.PNG)  
+      ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
+  - サンプルアプリ動作確認エラー
+    - ALBのDNS名でアクセスしようとすると502エラー発生⇒サーバー確認するとNginxが作動していない  
+      ![図](images_lec13/11-5-x_app_502_err.PNG)  
+    - サーバー名の長さは64以下にするか、上限値を増やす必要あり  
+      ![図](images_lec13/11-5-x_app_502_err2.PNG)  
+    - `/etc/nginx/nginx.conf`に設定項目を追加  
+      ![図](images_lec13/11-5-x_app_502_nginx_hash_size_128.PNG)  
+    - サンプルアプリの正常動作を確認  
+      ![図](images_lec13/11-5-x_app_ok.PNG)  
 
 - CircleCIへのSeverspec実装
   - Serverspecのorbs追加  
     ![図]()  
     ![図]()  
+    -
+    - a
+      ![図]()  
+      ![図]()  
+      ![図]()
+    - 詳細
 
 
 > [!NOTE]  
