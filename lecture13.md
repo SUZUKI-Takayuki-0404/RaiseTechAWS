@@ -265,36 +265,38 @@
       ```
       ![図](images_lec13/11-4-1_CLI_setup.PNG)
   - 変数取得
-    - ローカルからCLIを使ってCloudformationで構築したリソースから以下情報を取得するのに必要なコマンドを検討
+    - ローカルからCLIを使い、Cloudformationで構築したリソースから以下情報を取得するため、必要なコマンドを検討
       - EC2 Public IP Address
       - RDS Master User Name
       - RDS Master Usr Password
       - RDS Endpoint
       - ALB DNS Name
       - S3 Bucket Name
-  - Cloudformation
-    - スタック情報にEC2のPublic IPは表示されない  
-      ![図](images_lec13/11-4-2_cli_cloudformation_describe-stacks_not_conntain_PublicIP.PNG)  
-    - スタック情報にRDSのEndpoint・Userは表示されない\(PassはSystems Managerから取得する\)  
-      ![図](images_lec13/11-4-3_cli_cloudformation_describe-stacks_not_conntain_DBEndP.PNG)  
-    - スタック情報にALBのDNS Nameは表示されない  
-      ![図](images_lec13/11-4-4_cli_cloudformation_describe-stacks_not_conntain_ALBDNSName.PNG)  
-    - スタック情報にS3のBucketNameは表示あり  
-      ![図](images_lec13/11-4-5_cli_cloudforomation_describe-stacks_s3_query_name.PNG)  
   - EC2
-    - Public IPを取得  
-      ![図](images_lec13/11-4-6_cli_ec2_describe-instances_filter_name_query_PublicIP.PNG)  
+    - Public IPはスタック名から直接取得できないので、インスタンスIDを取得し、これを引数にして取得  
+      ![図](images_lec13/11-4-2_aws_instanceid_publicip.PNG)  
+      ![図](images_lec13/11-4-3_cli_ec2_describe-instances_filter_name_query_PublicIP.PNG)  
   - RDS
-    - Endpoint・Userを取得  
-      ![図](images_lec13/11-4-7_cli_rds_describe-instance_query_address.PNG)
-      ![図](images_lec13/11-4-8_cli_rds_describe-instance_query_user.PNG)  
+    - Endpoint・Userスタック名から直接取得できないので、DBインスタンスIDを取得し、これを引数にして取得  
+      ![図](images_lec13/11-4-4_aws_rds_resourceid_endpoint.PNG)  
+      ![図](images_lec13/11-4-5_cli_rds_describe-instance_query_address.PNG)  
+      ![図](images_lec13/11-4-6_cli_rds_describe-instance_query_user.PNG)  
+    - CircleCI実行時はインスタンスIDが変数に格納されないエラーが発生。AWS CLIを手動実行時は発生しない  
+      ![図](images_lec13/11-4-7_aws_rds_id_error2.PNG)  
+    - 変数代入時にエラーが発生しており、出力と代入とで行を分けることで回避  
+      ![図](images_lec13/11-4-8_aws_rds_id_error2-output-check1.PNG)  
+      ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
   - ALB
-    - DNS Nameを取得  
-      ![図](images_lec13/11-4-9_cli_enbv2_describe-lbs_query_LBName.PNG)  
+    - DNS Nameはスタック名から直接取得できないので、DNS ARNを取得し、これを引数にして取得を取得  
+      ![図](images_lec13/11-4-10_cli_enbv2_describe-lbs_query_LBName.PNG)  
+      ![図](images_lec13/11-4-11_aws_alb_arn_dns.PNG)  
   - Systems Manager
-    - Passを取得  
-      ![図](images_lec13/11-4-10_cli_ssm_get-parameter_pass.PNG)  
-  - 各変数をシェルスクリプトへ出力
+    - RDSのPassを取得  
+      ![図](images_lec13/11-4-12_cli_ssm_get-parameter_pass.PNG)  
+  - S3
+    - BucketNameを取得  
+      ![図](images_lec13/11-4-13_cli_cloudforomation_describe-stacks-resource_s3_query.PNG)  
+  - 各変数をシェルスクリプトへ出力  
     ```
     echo expourt 変数名=$(変数取得コマンド) >> シェルスクリプトファイル名
     ```
@@ -359,25 +361,59 @@
       ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
   - サンプルアプリ動作確認エラー
     - ALBのDNS名でアクセスしようとすると502エラー発生⇒サーバー確認するとNginxが作動していない  
-      ![図](images_lec13/11-5-x_app_502_err.PNG)  
+      ![図](images_lec13/11-5-29_app_502_err.PNG)  
     - サーバー名の長さは64以下にするか、上限値を増やす必要あり  
-      ![図](images_lec13/11-5-x_app_502_err2.PNG)  
+      ![図](images_lec13/11-5-30_app_502_err2.PNG)  
     - `/etc/nginx/nginx.conf`に設定項目を追加  
-      ![図](images_lec13/11-5-x_app_502_nginx_hash_size_128.PNG)  
+      ![図](images_lec13/11-5-31_app_502_nginx_hash_size_128.PNG)  
     - サンプルアプリの正常動作を確認  
-      ![図](images_lec13/11-5-x_app_ok.PNG)  
+      ![図](images_lec13/11-5-32_app_ok.PNG)  
 
 - CircleCIへのSeverspec実装
-  - Serverspecのorbs追加  
-    ![図]()  
-    ![図]()  
-    -
-    - a
-      ![図]()  
-      ![図]()  
-      ![図]()
-    - 詳細
-
+  - Serverspecの準備
+    - orbs追加  
+      ![図](images_lec13/11-6-1_spec_ruby_install_circleci.PNG)  
+    - ローカルで必要なファイルの作成のためRubyをインストール  
+      ![図](images_lec13/11-6-2_spec_ruby_install_local.PNG)  
+    - Serverspecのインストールと初期設定  
+      ![図](images_lec13/11-6-3_spec_install_local.PNG)  
+      ![図](images_lec13/11-6-5_spec_directories.PNG)  
+      ![図](images_lec13/11-6-7_spec_bundler_install_local.PNG)  
+    - [課題11](lecture11.md)で作成したテストコードをローカルにコピー  
+      ![図](images_lec13/11-6-8_spec_scp_testcode_from_kadai11.PNG)  
+  - Bundlerコマンド実行エラー  
+    - 必要なGemを`Gemfile`に追加して`push`すると、`Bundle install`コマンドを要求される。CircleCI実行時のコマンド実行もエラーが出るので、ローカルで実行が必要  
+      ![図](images_lec13/11-6-9_spec_add_gems.PNG)  
+      ![図](images_lec13/11-6-10_spec_exec_failed_need-bundle-install.PNG)  
+    - ローカルで実行しようとしてもエラー  
+      ![図](images_lec13/11-6-11_spec_failed_sudo-bundle-install.PNG)  
+    - Gemを個別にインストールしようとしてもエラーが出るが、`ruby-dev`または`rebu-devel`を要求される  
+      ![図](images_lec13/11-6-12_spec_exec_failed_need-bundle-install_need_ruby-dev_or_ruby-devel.PNG)  
+      ![図](images_lec13/11-6-13_spec_install_ruby-devl.PNG)  
+    - 個別にGemをインストールすると今度は成功  
+      ![図](images_lec13/11-6-14_spec_install_bcrypt_ed25519_pbkdf.PNG)  
+    - `Bundle install`コマンドも成功  
+      ![図](images_lec13/11-6-15_spec_sudo-bundle-install.PNG)  
+    - `.gitignore`に`vendor`および``ディレクトリを追加  
+      ![図](images_lec13/11-6-16_spec_add_ignore_vendor_bundle.PNG)  
+    - 改めて`push`すると今度は`rake`を要求されるので追加  
+      ![図](images_lec13/11-6-17_spec_failed_need-rake.PNG)  
+      ![図](images_lec13/11-6-18_spec_bundler_add_rake.PNG)  
+  - Host/(EC2 PublicIP/)への接続エラー
+    - `host`に接続できていない  
+      ![図](images_lec13/11-6-19_spec_failed_socketerror.PNG)  
+    - `spec_helper.rb`の`host`にhost情報が入力される  
+      ![図](images_lec13/11-6-20_spec_TARGET_HOST_dir.PNG)  
+    - `spec_helper.rb`の`host`にPublic IPを直接代入するもエラー  
+      ![図](images_lec13/11-6-21_spec_replace_TARGET_HOST.PNG)  
+      ![図](images_lec13/11-6-22_spec_failed_EADDRNOTAVAIL.PNG)  
+    - `.ssh/config`ファイルを作成しhost情報を直接記  
+      ![図](images_lec13/11-6-23_spec_add_ssh_config.PNG)  
+    - 80番及び22番ポートがListenしているかのテストコードでエラーが出ているが、実際は正常に動作している  
+      ![図](images_lec13/11-6-24_spec_check_path_in_serverspec.PNG)  
+    - `ss`コマンド実行時の環境変数が未設定で、ssコマンドが機能していなかったので、spec_helper.rb`に追加し解消  
+      ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)
+      ![図](images_lec13/11-6-26_spec_ok.PNG)  
 
 > [!NOTE]  
 > サンプル
