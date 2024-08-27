@@ -2,18 +2,62 @@
 
 ## 実施内容
 
+CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/circleci)に ServerSpec や Ansible の処理を追加し、一連の処理を成功させる。  
+- 構築した環境
+  - [課題5](lecture05.md)で実装した[サンプルアプリ](https://github.com/yuta-ushijima/raisetech-live8-sample-app.git)をAnsibleで実装自動化  
+  - [課題10](lecture10.md)でCloudformationにより構築自動化した環境に以下もVPC Flow logも追加  
+  - [課題11](lecture11.md)で作詞したServerspecを追加  
+  - [課題12](lecture12.md)でCfn-lintによりセキュリティ指摘されたRDSのパスワードをSystems Managerのパラメータストアに追加  
 
-### 実施結果
+  > [!NOTE]  
+  > 予め、以下を準備しておくこと
+  > - EC2 SSH接続用のpemキー  
+  > - Systems Manager
+  >   - SNSのメール通知機能で使用するメールアドレス\(String\)  
+  >   - RDSで使用するパスワード\(SecureString\)  
+        ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
 
-### 所感
+## 実施結果
+
+- CircleCIによる一連の自動化処理が成功したことを確認した  
+  - 使用したソースコード一式を[Lecture13-CI](https://github.com/SUZUKI-Takayuki-0404/Lecture13-CI)に保管  
+  - Cfn-lint  
+    ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
+  - Cloudformation  
+    ![図]()  
+  - Ansible  
+    ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
+  - Serverspec  
+    ![図](images_lec13/11-6-26_spec_ok.PNG)  
+- 自動構築したAWS環境上でサンプルアプリが正常に動作することを確認した  
+    ![図](images_lec13/11-5-32_app_ok.PNG)  
+
+## 所感
+
+- 過去の課題で手作業で構築してきた環境が全て自動化され、同じ環境を再構築するときの手間が著しく減ることが分かった。
+- 自動化までの一連のソースコード作成の工数を考えると、どの程度繰返し利用される環境に対し自動かをするかは考慮する必要がある。
+- AnsibleおよびServerspecをCircleCIに処理追加した際、手作業では問題なく動いた処理でエラーが発生し、ソースコードを修正する必要があるなど、ツールのクセを理解していく必要がある。
+
+## 主な手戻り事例
+ 
+- AWS CLI \(Ansibleへの変数の引継ぎ\)  
+  - 出力した値を変数に格納しようとした際に失敗 ⇒ 出力と変数格納を別コマンドに分割で解消  
+    ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
+- Ansible  
+  - サンプルアプリに対しSystemdが起動しない ⇒ 一度`bin/run`コマンドを実行することで解決  
+    ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)  
+  - 手作業では正常に動作した`timeout`の設定項目がCircleCIではエラー ⇒ コマンド内で`timeout`オプションを追加し解決  
+    ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
+- Serverspec  
+  - 手作業では正常に動作した指定ポート番号のListen確認がCircleCIではエラー ⇒ パスが異なっていたので、`spec_helper`に環境変数を追加  
+    ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)  
 
 ## 備忘録
 
 <details>
-<summary>作業工程</summary>
-</details>
+<summary>Ansibleのインストール</summary>
 
-- Ansibleのインストール (Ubuntu 22.04 LTS)
+- Ansibleのインストール (`Ubuntu 22.04 LTS`向け)
   - インストール準備とインストール
     ```
     sudo apt-get update
@@ -35,6 +79,7 @@
     ansible --version
     ```
     ![図](images_lec13/0-5_ansible_--version.PNG)  
+
 - Ansibleによる環境構築準備  
   - 階層構造  
     ![図](images_lec13/2-0-2_ansible_folder_tree.PNG)  
@@ -64,6 +109,10 @@
       ![図](images_lec13/1-4_ansible_cfg_inventory_path.PNG)  
     - EC2初回SSH接続時のfingerprintダイアログを発生させないため、`host_key_checking=False`の設定を追加  
       ![図](images_lec13/1-3-1_ansible_inventories_host_key_check_false.PNG)  
+
+</details>
+<details>
+<summary>Playbookの作成</summary>
 
 - Playbookの作成(Role別)
   - MySQL
@@ -119,7 +168,7 @@
       ![図](images_lec13/5-1-1_ImageMagick_install-epel_yn-diarog.PNG)  
     - 'epel-release'等のパッケージインストールはrootユーザー必須  
       ![図](images_lec13/5-1-1_ImageMagick_install-epel-release-and-others_failed_not-root.PNG)  
-    - 'remi-release-7'および'ImageMagick7'のインストール時は`sudo`コマンド必須
+    - 'remi-release-7'および'ImageMagick7'のインストール時は`sudo`コマンド必須  
       ![図](images_lec13/5-1-1_ImageMagick_install-remi_failed_sudo-not-found.PNG)  
 
   - raisetech-live8-sample-app
@@ -205,6 +254,10 @@
         ![図](images_lec13/10-1-2_overall_test_yum_error_countermeasure.PNG)  
         ![図](images_lec13/10-1-3_overall_test_yum_error_countermeasure2.PNG)  
 
+</details>
+<details>
+<summary>CircleCIへのCloudformation実装</summary>
+
 - CircleCIへのCloudformation実装
   - CircleCI
     - CircleCIの適用先となるGitHubリポジトリを新規作成  
@@ -251,11 +304,15 @@
       - SNS向けメールアドレス
       - RDS向けパスワード(SecureString対応)
         - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
-        ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
+          ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
     - [第12回課題](lecture12.md)で使用したcfn-lintによるセキュリティチェックもパスしていることを確認  
       ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
     - IAMの権限設定\(最終的な状態\)  
       ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
+
+</details>
+<details>
+<summary>AWS CLIによる各種変数の引継ぎ</summary>
 
 - AWS CLIによるCloudFormationで構築したリソースからAnsibleへの各種変数の引継ぎ  
   - AWS CLI
@@ -277,10 +334,10 @@
       ![図](images_lec13/11-4-2_aws_instanceid_publicip.PNG)  
       ![図](images_lec13/11-4-3_cli_ec2_describe-instances_filter_name_query_PublicIP.PNG)  
   - RDS
-    - Endpoint・Userスタック名から直接取得できないので、DBインスタンスIDを取得し、これを引数にして取得  
-      ![図](images_lec13/11-4-4_aws_rds_resourceid_endpoint.PNG)  
+    - Endpoint・Userはスタック名から直接取得できないので、DBインスタンスIDを取得し、これを引数にして取得  
+      ![図](images_lec13/11-4-4_cli_rds_describe-instance_query_user.PNG)  
       ![図](images_lec13/11-4-5_cli_rds_describe-instance_query_address.PNG)  
-      ![図](images_lec13/11-4-6_cli_rds_describe-instance_query_user.PNG)  
+      ![図](images_lec13/11-4-6_aws_rds_resourceid_endpoint.PNG)  
     - CircleCI実行時はインスタンスIDが変数に格納されないエラーが発生。AWS CLIを手動実行時は発生しない  
       ![図](images_lec13/11-4-7_aws_rds_id_error2.PNG)  
     - 変数代入時にエラーが発生しており、出力と代入とで行を分けることで回避  
@@ -300,6 +357,10 @@
     ```
     echo expourt 変数名=$(変数取得コマンド) >> シェルスクリプトファイル名
     ```
+
+</details>
+<details>
+<summary>CircleCIへのAnsible実装</summary>
 
 - CircleCIへのAnsible実装
   - Ansible
@@ -369,6 +430,10 @@
     - サンプルアプリの正常動作を確認  
       ![図](images_lec13/11-5-32_app_ok.PNG)  
 
+</details>
+<details>
+<summary>CircleCIへのSeverspec実装</summary>
+
 - CircleCIへのSeverspec実装
   - Serverspecの準備
     - orbs追加  
@@ -399,7 +464,7 @@
     - 改めて`push`すると今度は`rake`を要求されるので追加  
       ![図](images_lec13/11-6-17_spec_failed_need-rake.PNG)  
       ![図](images_lec13/11-6-18_spec_bundler_add_rake.PNG)  
-  - Host/(EC2 PublicIP/)への接続エラー
+  - Hostへの接続エラー
     - `host`に接続できていない  
       ![図](images_lec13/11-6-19_spec_failed_socketerror.PNG)  
     - `spec_helper.rb`の`host`にhost情報が入力される  
@@ -407,27 +472,12 @@
     - `spec_helper.rb`の`host`にPublic IPを直接代入するもエラー  
       ![図](images_lec13/11-6-21_spec_replace_TARGET_HOST.PNG)  
       ![図](images_lec13/11-6-22_spec_failed_EADDRNOTAVAIL.PNG)  
-    - `.ssh/config`ファイルを作成しhost情報を直接記  
+    - `.ssh/config`ファイルを作成しhost情報を直接記入するとエラー内容が変化  
       ![図](images_lec13/11-6-23_spec_add_ssh_config.PNG)  
-    - 80番及び22番ポートがListenしているかのテストコードでエラーが出ているが、実際は正常に動作している  
+    - 80番及び22番ポートがListenしていないエラーが出ているが、実際は正常に動作している ⇒ `ss`コマンド実行時の環境変数が未設定  
       ![図](images_lec13/11-6-24_spec_check_path_in_serverspec.PNG)  
-    - `ss`コマンド実行時の環境変数が未設定で、ssコマンドが機能していなかったので、spec_helper.rb`に追加し解消  
+    - ssコマンドが機能していなかったので、spec_helper.rb`に環境変数の設定追加し解消  
       ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)
       ![図](images_lec13/11-6-26_spec_ok.PNG)  
 
-> [!NOTE]  
-> サンプル
-
-> [!TIP]  
-> サンプル
-
-> [!IMPORTANT]  
-> サンプル
-
-> [!WARNING]  
-> サンプル
-
-> [!CAUTION]  
-> サンプル
-
-![図]() 
+</details>
