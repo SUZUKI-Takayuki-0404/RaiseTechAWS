@@ -9,13 +9,13 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - [課題11](lecture11.md)で作詞したServerspecを追加  
   - [課題12](lecture12.md)でCfn-lintによりセキュリティ指摘されたRDSのパスワードをSystems Managerのパラメータストアに追加  
 
-  > [!NOTE]  
-  > 予め、以下を準備しておくこと
-  > - EC2 SSH接続用のpemキー  
-  > - Systems Manager
-  >   - SNSのメール通知機能で使用するメールアドレス\(String\)  
-  >   - RDSで使用するパスワード\(SecureString\)  
-        ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
+> [!NOTE]  
+> 予め、以下を準備しておくこと
+> - EC2 SSH接続用のpemキー  
+> - Systems Manager
+>   - SNSのメール通知機能で使用するメールアドレス\(String\)  
+>   - RDSで使用するパスワード\(SecureString\)  
+      ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
 
 ## 実施結果
 
@@ -24,8 +24,10 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - Cfn-lint  
     ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
   - Cloudformation  
-    ![図]()  
+    ![図](images_lec13/11-3-23_integration-test_cfn.PNG)  
+    ![図](images_lec13/11-3-24_integration-test_cfn-ok.PNG)  
   - Ansible  
+    ![図](images_lec13/11-5-33_integration-test_ans-start.PNG)  
     ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
   - Serverspec  
     ![図](images_lec13/11-6-26_spec_ok.PNG)  
@@ -35,17 +37,22 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
 ## 所感
 
 - 過去の課題で手作業で構築してきた環境が全て自動化され、同じ環境を再構築するときの手間が著しく減ることが分かった。
-- 自動化までの一連のソースコード作成の工数を考えると、どの程度繰返し利用される環境に対し自動かをするかは考慮する必要がある。
+- 自動化のための一連のソースコード作成工数を考えると、自動化のメリットが充分あるか否かはよく検討する必要がある。
 - AnsibleおよびServerspecをCircleCIに処理追加した際、手作業では問題なく動いた処理でエラーが発生し、ソースコードを修正する必要があるなど、ツールのクセを理解していく必要がある。
 
 ## 主な手戻り事例
  
+- Cloudformation
+  - CircleCIによる実行のために権限設定が必要  
+    ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
 - AWS CLI \(Ansibleへの変数の引継ぎ\)  
   - 出力した値を変数に格納しようとした際に失敗 ⇒ 出力と変数格納を別コマンドに分割で解消  
     ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
 - Ansible  
   - サンプルアプリに対しSystemdが起動しない ⇒ 一度`bin/run`コマンドを実行することで解決  
     ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)  
+  - ansible.cfgの内容が読み込まれない ⇒ ルートディレクトリに置く事で解決
+    ![図](images_lec13/11-5-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
   - 手作業では正常に動作した`timeout`の設定項目がCircleCIではエラー ⇒ コマンド内で`timeout`オプションを追加し解決  
     ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
 - Serverspec  
