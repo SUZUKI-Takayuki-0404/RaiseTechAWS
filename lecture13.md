@@ -5,8 +5,9 @@
 CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/circleci)に ServerSpec や Ansible の処理を追加し、一連の処理を成功させる。  
 - 構築した環境
   - [課題5](lecture05.md)で実装した[サンプルアプリ](https://github.com/yuta-ushijima/raisetech-live8-sample-app.git)をAnsibleで実装自動化  
+      ![図]()  
   - [課題10](lecture10.md)でCloudformationにより構築自動化した環境に以下もVPC Flow logも追加  
-  - [課題11](lecture11.md)で作詞したServerspecを追加  
+  - [課題11](lecture11.md)で自動テストコードを作成したServerspecを追加  
   - [課題12](lecture12.md)でCfn-lintによりセキュリティ指摘されたRDSのパスワードをSystems Managerのパラメータストアに追加  
 
 > [!NOTE]  
@@ -18,6 +19,8 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
 
 ## 実施結果
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/SUZUKI-Takayuki-0404/Lecture13-CI/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/SUZUKI-Takayuki-0404/Lecture13-CI/tree/main)  
 
 - CircleCIによる一連の自動化処理が成功したことを確認した  
   - 使用したソースコード一式を[Lecture13-CI](https://github.com/SUZUKI-Takayuki-0404/Lecture13-CI)に保管  
@@ -31,6 +34,11 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
   - Serverspec  
     ![図](images_lec13/11-6-26_spec_ok.PNG)  
+  - CricleCI workflow  
+    ![図](images_lec13/12-1-1_integration-test_start.PNG)  
+    ![図](images_lec13/12-1-2_integration-test_cfn-start.PNG)  
+    ![図](images_lec13/12-1-3_integration-test_vars.PNG)  
+    ![図](images_lec13/12-1-9_all_complete.PNG)  
 - 自動構築したAWS環境上でサンプルアプリが正常に動作することを確認した  
     ![図](images_lec13/11-5-32_app_ok.PNG)  
 
@@ -55,6 +63,10 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     ![図](images_lec13/11-5-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
   - 手作業では正常に動作した`timeout`の設定項目がCircleCIではエラー ⇒ コマンド内で`timeout`オプションを追加し解決  
     ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
+  - CircleCIはアウトプットが無いと10分で処理を中断し、時間のかかるインストール工程が失敗 ⇒ タイムアウト時間を30分に延長  
+    ![図](images_lec13/11-5-33_integration-test_ans_fail_timeout.PNG)  
+    ![図](images_lec13/11-5-34_integration-test_ans_extend_timeout.PNG)  
+  - 
 - Serverspec  
   - 手作業では正常に動作した指定ポート番号のListen確認がCircleCIではエラー ⇒ パスが異なっていたので、`spec_helper`に環境変数を追加  
     ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)  
@@ -312,10 +324,14 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       - RDS向けパスワード(SecureString対応)
         - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
           ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
+    - AWS SNSのサブスクリプションの登録確認メール受信 ⇒ Confirmすれば設定完了  
+      ![図](images_lec13/11-3-23_integration-test_cfn_sns.PNG)  
     - [第12回課題](lecture12.md)で使用したcfn-lintによるセキュリティチェックもパスしていることを確認  
       ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
     - IAMの権限設定\(最終的な状態\)  
       ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
+    - 一連のスタック作成が完了  
+      ![図](images_lec13/11-3-24_integration-test_cfn_complete.PNG)  
 
 </details>
 <details>
@@ -424,10 +440,15 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - Cloudformationからの引継ぐ変数の名称を変更  
       ![図](images_lec13/11-5-25_ans_valiable_replace_variables_update.PNG)  
       ![図](images_lec13/11-5-26_ans_valiable_import_update_vars.PNG)  
-    - Ansible実行完了  
-      ![図](images_lec13/11-5-27_ansexecuting.PNG)  
-      ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
-  - サンプルアプリ動作確認エラー
+  - CircleCIのタイムアウトエラー
+    - アウトプットが無いと10分で処理を中断し、時間のかかるRubyインストール失敗  
+      ![図](images_lec13/11-5-33_integration-test_ans_fail_timeout.PNG)  
+    - `Ansible-playbook`実行がコマンド記述になるが、タイムアウト時間を30分に延長  
+      ![図](images_lec13/11-5-34_integration-test_ans_extend_timeout.PNG)  
+  - Ansible実行完了  
+    ![図](images_lec13/11-5-27_ansexecuting.PNG)  
+    ![図](images_lec13/11-5-28_ans_execution_ok.PNG)  
+  - サンプルアプリ動作確認エラー  
     - ALBのDNS名でアクセスしようとすると502エラー発生⇒サーバー確認するとNginxが作動していない  
       ![図](images_lec13/11-5-29_app_502_err.PNG)  
     - サーバー名の長さは64以下にするか、上限値を増やす必要あり  
