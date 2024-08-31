@@ -5,8 +5,8 @@
 CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_documents/tree/main/aws/samples/circleci)に ServerSpec や Ansible の処理を追加し、一連の処理を成功させる。  
 - 構築した環境
   - [課題5](lecture05.md)で実装した[サンプルアプリ](https://github.com/yuta-ushijima/raisetech-live8-sample-app.git)をAnsibleで実装自動化  
-      ![図]()  
-  - [課題10](lecture10.md)でCloudformationにより構築自動化した環境に以下もVPC Flow logも追加  
+    ![図](images_lec13/13-1-1_overview_lect13.jpg)  
+  - [課題10](lecture10.md)でCloudformationにより構築自動化した環境にVPC Flow logも追加  
   - [課題11](lecture11.md)で自動テストコードを作成したServerspecを追加  
   - [課題12](lecture12.md)でCfn-lintによりセキュリティ指摘されたRDSのパスワードをSystems Managerのパラメータストアに追加  
 
@@ -38,15 +38,15 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     ![図](images_lec13/12-1-1_integration-test_start.PNG)  
     ![図](images_lec13/12-1-2_integration-test_cfn-start.PNG)  
     ![図](images_lec13/12-1-3_integration-test_vars.PNG)  
-    ![図](images_lec13/12-1-9_all_complete.PNG)  
+    ![図](images_lec13/12-1-4_all_complete.PNG)  
 - 自動構築したAWS環境上でサンプルアプリが正常に動作することを確認した  
     ![図](images_lec13/11-5-32_app_ok.PNG)  
 
 ## 所感
 
-- 過去の課題で手作業で構築してきた環境が全て自動化され、同じ環境を再構築するときの手間が著しく減ることが分かった。
+- 過去の課題で手作業で構築してきた環境が全て自動化され、同じ環境を再構築するときの手間が著しく減ることが分かった。（GitHubにpush後、30分程度で自動構築が完了した）  
 - 自動化のための一連のソースコード作成工数を考えると、自動化のメリットが充分あるか否かはよく検討する必要がある。
-- AnsibleおよびServerspecをCircleCIに処理追加した際、手作業では問題なく動いた処理でエラーが発生し、ソースコードを修正する必要があるなど、ツールのクセを理解していく必要がある。
+- AnsibleおよびServerspecをCircleCIに処理追加した際、手作業では問題なく動いた処理でエラーが発生し、ソースコードを修正する必要があるなど、ツールのクセを理解する必要がある。
 
 ## 主な手戻り事例
  
@@ -57,16 +57,16 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - 出力した値を変数に格納しようとした際に失敗 ⇒ 出力と変数格納を別コマンドに分割で解消  
     ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
 - Ansible  
+  - MySQLダウンロード時に、コマンドラインでは成功したURLでエラー発生 ⇒ curlコマンドでステータスが302であり、リダイレクト先のURLに変更で成功  
+    ![図](images_lec13/2-1-1_mysql_download-url-err1.PNG)  
   - サンプルアプリに対しSystemdが起動しない ⇒ 一度`bin/run`コマンドを実行することで解決  
     ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)  
-  - ansible.cfgの内容が読み込まれない ⇒ ルートディレクトリに置く事で解決
+  - ansible.cfgの内容が読み込まれない ⇒ ルートディレクトリに置く事で解決  
     ![図](images_lec13/11-5-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
   - 手作業では正常に動作した`timeout`の設定項目がCircleCIではエラー ⇒ コマンド内で`timeout`オプションを追加し解決  
     ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
-  - CircleCIはアウトプットが無いと10分で処理を中断し、時間のかかるインストール工程が失敗 ⇒ タイムアウト時間を30分に延長  
+  - CircleCIはアウトプットが無いと10分で処理を中断し、時間のかかるインストール工程が失敗 ⇒ CircleCIのタイムアウト時間を延長  
     ![図](images_lec13/11-5-33_integration-test_ans_fail_timeout.PNG)  
-    ![図](images_lec13/11-5-34_integration-test_ans_extend_timeout.PNG)  
-  - 
 - Serverspec  
   - 手作業では正常に動作した指定ポート番号のListen確認がCircleCIではエラー ⇒ パスが異なっていたので、`spec_helper`に環境変数を追加  
     ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)  
@@ -124,7 +124,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       ![図](images_lec13/1-3_ansible_inventories_host-ok.PNG)  
   
   - Ansible.cfgの作成
-    - Inventoryファイルのパスを追加し、`ansible-playbook`コマンド時の追記を省略  
+    - Inventoryファイルのパスを追加し、`ansible-playbook`コマンド時のオプション追記を省略  
       ![図](images_lec13/1-4_ansible_cfg_inventory_path.PNG)  
     - EC2初回SSH接続時のfingerprintダイアログを発生させないため、`host_key_checking=False`の設定を追加  
       ![図](images_lec13/1-3-1_ansible_inventories_host_key_check_false.PNG)  
@@ -135,7 +135,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
 
 - Playbookの作成(Role別)
   - MySQL
-    - MySQLのRepositoryをEC2に追加する際、コマンドライン手入力で使っていたURLではエラー出力（コマンドライン入力時は成功）
+    - MySQLのRepositoryをEC2に追加する際、コマンドラインで使ったダウンロード元URLでエラー（コマンドライン入力時は成功）
     - EC2に直接追加せず、EC2の一時ファイル保管ディレクトリに一度ダウンロードを試行しても、403エラー出力（ブラウザにURL直接入力時は成功）
     - curlコマンドでURLを確認するとリダイレクトされている事が判明（ステータスコード302）  
       ![図](images_lec13/2-1-1_mysql_download-url-err1.PNG)
@@ -226,22 +226,23 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - `puma.service.sample`を`/etc/systemd/system/puma.service`としてコピー  
     - systemdがインスタンス起動時に自動起動されるよう設定(今時点では起動不要なのでstoppedに設定)  
       ![図](images_lec13/7-1-1_systemd_setup.PNG)  
-    - 上記だけだとSystemd起動エラー発生  
-      ![図](images_lec13/7-2-1_systemd_start-failed1.PNG)  
-      ![図](images_lec13/7-2-2_systemd_start-failed2.PNG)  
-      ![図](images_lec13/7-2-3_systemd-start-failed_journalctrl_-xe.PNG)
+    - 起動エラー処置  
+      - 上記だけだとSystemd起動エラー発生  
+        ![図](images_lec13/7-2-1_systemd_start-failed1.PNG)  
+        ![図](images_lec13/7-2-2_systemd_start-failed2.PNG)  
+        ![図](images_lec13/7-2-3_systemd-start-failed_journalctrl_-xe.PNG)  
       - ChatGPTによる検討もしたが結局手詰まり  
         ![図](images_lec13/7-3-1_systemd_start_chatGPT1.PNG)  
         ![図](images_lec13/7-3-2_systemd_start_chatGPT2.PNG)  
-        ![図](images_lec13/7-3-3_systemd-start-failed_journalctrl_-xe_puma.PNG)
+        ![図](images_lec13/7-3-3_systemd-start-failed_journalctrl_-xe_puma.PNG)  
       - `bin/dev`コマンドを一度実行するとエラー発生しなくなることが判明  
         ![図](images_lec13/7-4-1_systemd-start_after-bindev.PNG)  
-        ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)
+        ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)  
       - `bin/dev`コマンド内で呼び出しているgemパッケージをインストールしても変化なし  
-        ![図](images_lec13/7-4-3_systemd_inside-bindev.PNG)
+        ![図](images_lec13/7-4-3_systemd_inside-bindev.PNG)  
       - 試行錯誤の結果、`bin/dev`コマンドを一度実行するとエラーは解消するが、正常処理の範囲内では実行を止められないので、タイムアウトさせて終了させるが、サンプルアプリケーションが起動したままになってしまうので、インスタンスを再起動  
         ![図](images_lec13/7-4-4_systemd_bindev-with-timeout.PNG)  
-        ![図](images_lec13/7-4-5_systemd_reboot-instance.PNG)
+        ![図](images_lec13/7-4-5_systemd_reboot-instance.PNG)  
 
   - Nginx
     - `/etc/nginx/conf.d/app.conf`はファイル自体無いので課題5で作成したものをテンプレートして使用  
@@ -259,7 +260,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       - 以下はロードバランサ経由でアクセスした際のエラー防止策であり画像保存先をS3に変更する目的ではないが、併せて設定しておく  
         ![図](images_lec13/9-1-2_storage-replace-devlopment.PNG)  
     - `config/storage/yml`の一部内容を書き換え  
-      ![図](images_lec13/9-2-1_scp_config_strage_template.PNG)
+      ![図](images_lec13/9-2-1_scp_config_strage_template.PNG)  
       - ansible.builtin.replaceモジュールで文字列置換に予期せぬエラー発生  
         ![図](images_lec13/9-2-2_storage_replace_failed.PNG)  
       - 変換対象の文字列から`['を除外すると成功  
@@ -313,14 +314,15 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       ![図](images_lec13/11-3-14_cfn_vpc_failed3_cfn_access-denied.PNG)  
       ![図](images_lec13/11-3-15_cfn_vpc_failed3_cfn_access-added.PNG)  
       ![図](images_lec13/11-3-16_cfn_vpc_ok_cfn_access-added.PNG)  
+    - IAMの権限設定\(最終的な状態\)  
+      ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
     - IAMの設定変更\(今回はロールの作成\)を行っているテンプレートファイルには追加の設定項目`CAPABILITY_NAMED_IAM`が必要  
       ![図](images_lec13/11-3-17_cfn_error_CAPABILITY_NAMED_IAM.PNG)  
       ![図](images_lec13/11-3-18_cfn_error_CAPABILITY_NAMED_IAM2.PNG)  
     - 参考：CircleCIのエラーメッセージの詳細説明機能もエラー確認に有益  
       ![図](images_lec13/11-3-19_cfn_error_intelligent_summarize_failure_on.PNG)  
     - Systems Managerにテンプレートファイルへのハードコーディングを避けたい情報を登録  
-      - EC2向けセキュリティグループのマイIPアドレス  
-      - SNS向けメールアドレス
+      - Amazon SNS向けメールアドレス
       - RDS向けパスワード(SecureString対応)
         - 補足：今回はパスワードローテーションを使用しない、使用料無料の理由から、Secrets ManagerではなくSystems Managerを使用  
           ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
@@ -328,8 +330,6 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
       ![図](images_lec13/11-3-23_integration-test_cfn_sns.PNG)  
     - [第12回課題](lecture12.md)で使用したcfn-lintによるセキュリティチェックもパスしていることを確認  
       ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
-    - IAMの権限設定\(最終的な状態\)  
-      ![図](images_lec13/11-3-22_IAM_permission_list.PNG)  
     - 一連のスタック作成が完了  
       ![図](images_lec13/11-3-24_integration-test_cfn_complete.PNG)  
 
@@ -505,7 +505,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - 80番及び22番ポートがListenしていないエラーが出ているが、実際は正常に動作している ⇒ `ss`コマンド実行時の環境変数が未設定  
       ![図](images_lec13/11-6-24_spec_check_path_in_serverspec.PNG)  
     - ssコマンドが機能していなかったので、spec_helper.rb`に環境変数の設定追加し解消  
-      ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)
+      ![図](images_lec13/11-6-25_spec_set_path_ok.PNG)  
       ![図](images_lec13/11-6-26_spec_ok.PNG)  
 
 </details>
