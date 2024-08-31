@@ -10,20 +10,12 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - [課題11](lecture11.md)で自動テストコードを作成したServerspecを追加  
   - [課題12](lecture12.md)でCfn-lintによりセキュリティ指摘されたRDSのパスワードをSystems Managerのパラメータストアに追加  
 
-> [!NOTE]  
-> 予め、以下を準備しておくこと
-> - EC2 SSH接続用のpemキー  
-> - Systems Manager
->   - SNSのメール通知機能で使用するメールアドレス\(String\)  
->   - RDSで使用するパスワード\(SecureString\)  
-      ![図](images_lec13/11-3-20_cfn_ssm_created.PNG)  
-
 ## 実施結果
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/SUZUKI-Takayuki-0404/Lecture13-CI/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/SUZUKI-Takayuki-0404/Lecture13-CI/tree/main)  
 
 - CircleCIによる一連の自動化処理が成功したことを確認した  
-  - 使用したソースコード一式を[Lecture13-CI](https://github.com/SUZUKI-Takayuki-0404/Lecture13-CI)に保管  
+  - 作成したソースコード等を[Lecture13-CI](https://github.com/SUZUKI-Takayuki-0404/Lecture13-CI)に保管  
   - Cfn-lint  
     ![図](images_lec13/11-3-21_cfn_lint_success.PNG)  
   - Cloudformation  
