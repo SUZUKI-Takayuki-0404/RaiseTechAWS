@@ -59,12 +59,10 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
 - Ansible  
   - MySQLダウンロード時に、コマンドラインでは成功したURLでエラー発生 ⇒ curlコマンドでステータスが302であり、リダイレクト先のURLに変更で成功  
     ![図](images_lec13/2-1-1_mysql_download-url-err1.PNG)  
-  - サンプルアプリに対しSystemdが起動しない ⇒ 一度`bin/run`コマンドを実行することで解決  
-    ![図](images_lec13/7-4-2_systemd_start_after-bindev2.PNG)  
   - ansible.cfgの内容が読み込まれない ⇒ ルートディレクトリに置く事で解決  
     ![図](images_lec13/11-5-17_ansible_timeout_cfg-out-of_ansible-folder.PNG)  
-  - 手作業では正常に動作した`timeout`の設定項目がCircleCIではエラー ⇒ コマンド内で`timeout`オプションを追加し解決  
-    ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
+  - 手作業では正常に動作した`timeout`の項目がCircleCIではエラー ⇒ `shell`コマンド内で`timeout`オプションを追加し解決  
+    ![図](images_lec13/11-5-23_ans_install_timeout-update.PNG)  
   - CircleCIはアウトプットが無いと10分で処理を中断し、時間のかかるインストール工程が失敗 ⇒ CircleCIのタイムアウト時間を延長  
     ![図](images_lec13/11-5-33_integration-test_ans_fail_timeout.PNG)  
 - Serverspec  
@@ -430,7 +428,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - `timeout`設定をコロンで囲むと、'ansible.builtin.shell'モジュールとコンフリクトしていると指摘  
       ![図](images_lec13/11-5-21_ans_install_failed_anyenv_conflict.PNG)  
     - `timeout`設定をコマンド内に変更  
-      ![図](images_lec13/11-5-21_ans_install_timeout-update.PNG)  
+      ![図](images_lec13/11-5-23_ans_install_timeout-update.PNG)  
   - Ansible内の変数代入エラー
     - `ansible/site.yml`で定義した変数が代入できていない  
       ![図](images_lec13/11-5-22_ans_valiable_import_failed.PNG)  
