@@ -31,6 +31,8 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     ![図](images_lec13/12-1-2_integration-test_cfn-start.PNG)  
     注釈：直下に示すCloudformationからAnsibleに渡した変数は、動作確認後にセキュリティのため非表示に変更し、パスワードも変更済み  
     ![図](images_lec13/12-1-3_integration-test_vars.PNG)  
+    ![図](images_lec13/11-4-14_aws_log_without_sensitive_info.PNG)  
+    全工程が成功  
     ![図](images_lec13/12-1-4_all_complete.PNG)  
 - 自動構築したAWS環境上でサンプルアプリが正常に動作することを確認した  
     ![図](images_lec13/11-5-32_app_ok.PNG)  
