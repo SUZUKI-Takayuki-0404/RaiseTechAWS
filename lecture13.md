@@ -29,6 +29,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - CricleCI workflow  
     ![図](images_lec13/12-1-1_integration-test_start.PNG)  
     ![図](images_lec13/12-1-2_integration-test_cfn-start.PNG)  
+    注釈：直下に示すCloudformationからAnsibleに渡した変数は、動作確認後にセキュリティのため非表示に変更し、パスワードも変更済み  
     ![図](images_lec13/12-1-3_integration-test_vars.PNG)  
     ![図](images_lec13/12-1-4_all_complete.PNG)  
 - 自動構築したAWS環境上でサンプルアプリが正常に動作することを確認した  
@@ -354,6 +355,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - CircleCI実行時はインスタンスIDが変数に格納されないエラーが発生。AWS CLIを手動実行時は発生しない  
       ![図](images_lec13/11-4-7_aws_rds_id_error2.PNG)  
     - 変数代入時にエラーが発生しており、出力と代入とで行を分けることで回避  
+      注釈：直下に示すCloudformationからAnsibleに渡した変数は、動作確認後にセキュリティのため非表示に変更し、パスワードも変更済み  
       ![図](images_lec13/11-4-8_aws_rds_id_error2-output-check1.PNG)  
       ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
   - ALB
