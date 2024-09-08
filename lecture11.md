@@ -95,7 +95,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
 ### 実行結果
 
   テスト成功を確認  
-  ![図](images_lec11/5-13-1_serverspec_test_ok.PNG)  
+  ![図](images_lec11/5-14-1_serverspec_test_ok.PNG)  
 
 ## 所感
 
@@ -275,7 +275,7 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
     ```
     ![図](images_lec11/5-8-3_bin_setup_start.PNG)  
     > [!NOTE]
-    不足分のパッケージ(sassc2.4.0)のインストールが終わらなくなってしまうブルが発生。  
+    不足分のパッケージ(sassc2.4.0)のインストールが終わらなくなってしまうトラブルが発生。  
     追加インストールするパッケージの一つを個別にインストールした後、bin/devコマンドを実行したところ成功
     ![図](images_lec11/5-8-4_freeze_bundle_install_sassc.PNG)  
     ![図](images_lec11/5-8-5_gem_install_sass-rails.PNG)  
@@ -384,8 +384,16 @@ Serverspec のテスト[サンプルコード](https://github.com/MasatoshiMizum
   - 再度確認すると問題なく表示
     ![図](images_lec11/5-12-14_Furuits_Listed_port80.PNG)  
 
+- S3への画像保存
+  - 保存先設定をローカルから切替  
+    ![図](images_lec11/5-13-1_S3-config_storage-ylm.PNG)  
+    ![図](images_lec11/5-13-2_S3-development-rb_config-active_strage_service_amazon.PNG)  
+  - 暗号化エラーが出ていたので修正  
+    ![図](images_lec11/5-13-3_Rails_encryption_err1.PNG)  
+    ![図](images_lec11/5-13-4_Rails_encryption_err_solved1.PNG)  
+
 - Serverspec
-  - インストール
+  - インストール  
     ![図](images_lec11/1-1_install_severspec_rake.PNG)  
     ![図](images_lec11/1-2_serverspec-init.PNG)  
 
