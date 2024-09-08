@@ -29,7 +29,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
   - CricleCI workflow  
     ![図](images_lec13/12-1-1_integration-test_start.PNG)  
     ![図](images_lec13/12-1-2_integration-test_cfn-start.PNG)  
-    注釈：直下に示すCloudformationからAnsibleに渡した変数は、動作確認後にセキュリティのため非表示に変更し、パスワードも変更済み  
+    注釈：直下に示すCloudformationからAnsibleに渡した変数は、セキュリティのため非表示に変更し、パスワード変更・CircleCiから履歴削除済み \(手戻り事例を参照\)  
     ![図](images_lec13/12-1-3_integration-test_vars.PNG)  
     ![図](images_lec13/11-4-14_aws_log_without_sensitive_info.PNG)  
     全工程が成功  
@@ -51,6 +51,14 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
 - AWS CLI \(Ansibleへの変数の引継ぎ\)  
   - 出力した値を変数に格納しようとした際に失敗 ⇒ 出力と変数格納を別コマンドに分割で解消  
     ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
+  - CircleCIのログにRDSのID・PASSを表示させてしまい機密情報流出 ⇒ Amazon Systems Managerに登録したPASSを変更だけでなく、CircleCIのプロジェクト削除で処置  
+    - CircleCIのサポートセンターに依頼し、サポートセンター担当者の方からのメールによる意思確認の後、プロジェクト\(全ビルド履歴\)の削除が完了  
+      ![図](images_lec13/11-4-15_deletion_request.PNG)  
+      ![図](images_lec13/11-4-16_deletion_email_communication.PNG)  
+    - 参考情報  
+      - 現在のCircleCIでは、特定のビルドだけ削除は不可能：[リンク](https://support.circleci.com/hc/en-us/articles/360036286553-Can-I-delete-a-specific-build)  
+      - プロジェクト削除で全ビルド履歴を削除可能（無料プランでも90日で履歴削除）：[リンク](https://support.circleci.com/hc/en-us/articles/21040161057947-Can-I-delete-a-project)  
+      - 削除依頼の手順：[リンク](https://circleci.com/docs/stop-building-a-project-on-circleci/#remove-a-project-from-circleci)  
 - Ansible  
   - MySQLダウンロード時に、コマンドラインでは成功したURLでエラー発生 ⇒ curlコマンドでステータスが302であり、リダイレクト先のURLに変更で成功  
     ![図](images_lec13/2-1-1_mysql_download-url-err1.PNG)  
@@ -357,7 +365,7 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
     - CircleCI実行時はインスタンスIDが変数に格納されないエラーが発生。AWS CLIを手動実行時は発生しない  
       ![図](images_lec13/11-4-7_aws_rds_id_error2.PNG)  
     - 変数代入時にエラーが発生しており、出力と代入とで行を分けることで回避  
-      注釈：直下に示すCloudformationからAnsibleに渡した変数は、動作確認後にセキュリティのため非表示に変更し、パスワードも変更済み  
+      注釈：直下に示すCloudformationからAnsibleに渡した変数は、セキュリティのため非表示に変更し、パスワード変更・CircleCiから履歴削除済み \(手戻り事例を参照\)  
       ![図](images_lec13/11-4-8_aws_rds_id_error2-output-check1.PNG)  
       ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
   - ALB
