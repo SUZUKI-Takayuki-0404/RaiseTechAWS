@@ -51,11 +51,11 @@ CircleCI の[サンプル](https://github.com/MasatoshiMizumoto/raisetech_docume
 - AWS CLI \(Ansibleへの変数の引継ぎ\)  
   - 出力した値を変数に格納しようとした際に失敗 ⇒ 出力と変数格納を別コマンドに分割で解消  
     ![図](images_lec13/11-4-9_aws_rds_id_ok.PNG)  
-  - CircleCIのログにRDSのID・PASSを表示させてしまい機密情報流出 ⇒ Amazon Systems Managerに登録したPASSを変更だけでなく、CircleCIのプロジェクト削除で処置  
+  - CircleCIのログにRDSのID・PASSを表示させてしまい機密情報流出 ⇒ AWS Systems Managerに登録したPASSの変更だけでなく、CircleCIのプロジェクト削除で処置  
     - CircleCIのサポートセンターに依頼し、サポートセンター担当者の方からのメールによる意思確認の後、プロジェクト\(全ビルド履歴\)の削除が完了  
       ![図](images_lec13/11-4-15_deletion_request.PNG)  
       ![図](images_lec13/11-4-16_deletion_email_communication.PNG)  
-    - 参考情報  
+    - 参考情報 \(プロジェクト削除\)  
       - 現在のCircleCIでは、特定のビルドだけ削除は不可能：[リンク](https://support.circleci.com/hc/en-us/articles/360036286553-Can-I-delete-a-specific-build)  
       - プロジェクト削除で全ビルド履歴を削除可能（無料プランでも90日で履歴削除）：[リンク](https://support.circleci.com/hc/en-us/articles/21040161057947-Can-I-delete-a-project)  
       - 削除依頼の手順：[リンク](https://circleci.com/docs/stop-building-a-project-on-circleci/#remove-a-project-from-circleci)  
